@@ -74,12 +74,16 @@ public class SteamService(SettingsService settings)
     public string? StPlugInDir =>
         EffectivePath is { } p ? Path.Combine(p, "config", "stplug-in") : null;
 
+    /// <summary>Full path to config\lua, the original LuaTools/OpenSteamTools Lua directory.</summary>
+    public string? LuaDir =>
+        EffectivePath is { } p ? Path.Combine(p, "config", "lua") : null;
+
     /// <summary>
     /// Full path to depotcache (where .manifest files go), or null if Steam isn't located.
     /// </summary>
     /// <remarks>
     /// This is <c>&lt;Steam&gt;\depotcache</c>, a SIBLING of steamapps — NOT <c>config\depotcache</c>.
-    /// Only stplug-in lives under config; that folder is SteamTools'. depotcache is Steam's own, and
+    /// LuaTools/OpenSteamTools Lua directories live under config; depotcache is Steam's own, and
     /// Steam builds the path as <c>%s/depotcache/%d_%llu.manifest</c> off the install root
     /// (the literal is in steamclient64.dll, listed beside /common, /downloading, /temp and /workshop).
     ///

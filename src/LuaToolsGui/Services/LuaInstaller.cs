@@ -12,7 +12,7 @@ public record InstallResult(bool LuaInstalled, int ManifestCount, IReadOnlyList<
 }
 
 /// <summary>
-/// Installs downloaded lua/manifest files into Steam: &lt;appid&gt;.lua → config\stplug-in,
+/// Installs downloaded lua/manifest files into Steam: &lt;appid&gt;.lua → config\stplug-in and config\lua,
 /// *.manifest → depotcache. Best-effort per file (a locked file doesn't abort the rest).
 ///
 /// Note the asymmetry, it is not a typo: stplug-in is under config (it is SteamTools'), depotcache is
@@ -135,21 +135,26 @@ public partial class LuaInstaller(SteamService steam, SettingsService settings, 
         return File.Exists(path) ? path : null;
     }
 
-    /// <summary>Copy a bare &lt;appid&gt;.lua into stplug-in (overwrites). Used for DLC unlocks.
+    /// <summary>Copy a bare &lt;appid&gt;.lua into both Lua directories (overwrites). Used for DLC unlocks.
     /// <paramref name="forceLocked"/> keeps manifest pins (for Denuvo fixes). The build id is read from
     /// <paramref name="luaPath"/>'s own name, so a &lt;appid&gt;_&lt;buildid&gt;.lua is vaulted as that build.</summary>
     public InstallResult InstallLua(string luaPath, long appId, bool forceLocked = false, string? source = null)
     {
-        string? dir = steam.StPlugInDir;
-        if (dir is null) return InstallResult.Fail(Resources.Strings.Err_SteamNotFound);
+        string? plugDir = steam.StPlugInDir;
+        string? luaDir = steam.LuaDir;
+        if (plugDir is null || luaDir is null)
+            return InstallResult.Fail(Resources.Strings.Err_SteamNotFound);
 
         try
         {
-            Directory.CreateDirectory(dir);
-            string dest = Path.Combine(dir, $"{appId}.lua");
+            Directory.CreateDirectory(plugDir);
+            Directory.CreateDirectory(luaDir);
+            string dest = Path.Combine(plugDir, $"{appId}.lua");
+            string luaDest = Path.Combine(luaDir, $"{appId}.lua");
             string? buildId = BuildIdFromFileName(luaPath);
 
             WriteLua(luaPath, dest, KeepPinsFor(buildId, forceLocked));
+            WriteLua(dest, luaDest, KeepPinsFor(buildId, forceLocked));
             CaptureInstalled(appId, dest, buildId, source); // exactly what Steam now reads → the active build
             RecordLoaded(appId);
             return new InstallResult(LuaInstalled: true, ManifestCount: 0, Failed: [], Error: null);
@@ -261,15 +266,16 @@ public partial class LuaInstaller(SteamService steam, SettingsService settings, 
     }
 
     /// <summary>
-    /// Extract a manifest zip into Steam: the .lua → stplug-in (renamed to &lt;appid&gt;.lua),
+    /// Extract a manifest zip into Steam: the .lua → both Lua directories (renamed to &lt;appid&gt;.lua),
     /// every *.manifest → depotcache. Zips may carry no manifests. That's fine. Best-effort.
     /// <paramref name="forceLocked"/> keeps manifest pins (for Denuvo fixes).
     /// </summary>
     public InstallResult InstallZip(string zipPath, long appId, bool forceLocked = false, string? source = null)
     {
         string? plugDir = steam.StPlugInDir;
+        string? luaDir = steam.LuaDir;
         string? depotDir = steam.DepotCacheDir;
-        if (plugDir is null || depotDir is null)
+        if (plugDir is null || luaDir is null || depotDir is null)
             return InstallResult.Fail(Resources.Strings.Err_SteamNotFound);
 
         ZipArchive archive;
@@ -283,6 +289,7 @@ public partial class LuaInstaller(SteamService steam, SettingsService settings, 
         using (archive)
         {
             try { Directory.CreateDirectory(plugDir); } catch { /* reported per-file below */ }
+            try { Directory.CreateDirectory(luaDir); } catch { }
             try { Directory.CreateDirectory(depotDir); } catch { }
 
             foreach (var entry in archive.Entries)
@@ -322,6 +329,8 @@ public partial class LuaInstaller(SteamService steam, SettingsService settings, 
                             string? buildId = BuildIdFromFileName(name);
 
                             WriteLua(tmp, dest, KeepPinsFor(buildId, forceLocked));
+                            WriteLua(dest, Path.Combine(luaDir, $"{appId}.lua"),
+                                KeepPinsFor(buildId, forceLocked));
                             CaptureInstalled(appId, dest, buildId, source);
                             luaInstalled = true;
                             RecordLoaded(appId);
