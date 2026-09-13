@@ -209,13 +209,15 @@ public partial class ModeViewModel : ObservableObject
                 Cards.RemoveAt(i);
 
         // Add newly-visible cards in definition order.
-        foreach (var def in visible)
+        for (int i = 0; i < visible.Count; i++)
+        {
+            var def = visible[i];
             if (!Cards.Any(c => c.Mode == def.Mode))
             {
-                int idx = visible.IndexOf(def);
-                idx = Math.Min(idx, Cards.Count);
+                int idx = Math.Min(i, Cards.Count);
                 Cards.Insert(idx, new ModeCardViewModel(def.Mode, def.DisplayName, def.Description));
             }
+        }
     }
 
     /// <summary>
@@ -225,15 +227,15 @@ public partial class ModeViewModel : ObservableObject
 
     public async Task LoadAsync(bool forceRefresh = false)
     {
-        // First time with no mode selected: try to auto-detect an existing install by hashing the
-        // on-disk DLLs against published releases, and adopt the match as active.
+        // First time with no mode selected: adopt a manually supplied OpenSteamTools install
+        // when all required local files are present.
         if (!_detectionAttempted && _unlocker.SelectedMode is null)
         {
             _detectionAttempted = true;
             await _unlocker.DetectActiveModeAsync();
         }
 
-        // Re-evaluate which cards are visible (hidden modes appear only when revealed).
+        // Rebuild the cards from the currently supported mode definitions.
         SyncCards();
 
         var active = _unlocker.SelectedMode;

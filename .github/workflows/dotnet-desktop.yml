@@ -31,10 +31,10 @@ jobs:
         run: dotnet restore
 
       - name: Publish Release
-        run: dotnet publish --configuration Release --output ./build/Release
+        run: dotnet publish ./src/LuaToolsGui/LuaToolsGui.csproj --configuration Release --output ./build/Release
 
       - name: Publish Debug
-        run: dotnet publish --configuration Debug --output ./build/Debug
+        run: dotnet publish ./src/LuaToolsGui/LuaToolsGui.csproj --configuration Debug --output ./build/Debug
 
       - uses: actions/upload-artifact@v4
         with:
