@@ -28,18 +28,15 @@ public partial class ModeCardViewModel(UnlockerMode mode, string title, string d
     /// </summary>
     public bool ShowActionButton => !(Mode == UnlockerMode.Custom && IsActive);
 
-    /// <summary>Our own fork is the steer-here option.</summary>
-    public bool IsRecommended => Mode == UnlockerMode.Bst;
-
     /// <summary>OST is the nightly channel, so it carries the amber warning.</summary>
     public bool IsExperimental => Mode == UnlockerMode.Ost;
 
-    /// <summary>Both OpenSteamTool-derived builds carry native CloudRedirect support.</summary>
-    public bool SupportsCloudRedirect => Mode is UnlockerMode.Ost or UnlockerMode.Bst;
+    /// <summary>OpenSteamTools carries native CloudRedirect support.</summary>
+    public bool SupportsCloudRedirect => Mode == UnlockerMode.Ost;
 }
 
 /// <summary>
-/// "Mode" page: OpenSteamTools / BetterSteamTools / Custom. Mutually exclusive, one active at a time.
+/// "Mode" page: OpenSteamTools / Custom. Mutually exclusive, one active at a time.
 /// Checks status on page open; each card installs/switches after a Steam-shutdown confirmation, then
 /// relaunches Steam so the new mode takes effect.
 /// </summary>
@@ -103,7 +100,7 @@ public partial class ModeViewModel : ObservableObject
         }
     }
 
-    // ── CloudRedirect add-on (bottom panel; usable when either OST or BST is active) ───
+    // ── CloudRedirect add-on (bottom panel; usable when OST is active) ───
     private const string CloudRedirectTitle = "CloudRedirect"; // product name, not localized
 
     [ObservableProperty]
@@ -138,7 +135,7 @@ public partial class ModeViewModel : ObservableObject
     /// update only when unlocked (Nightly active), respecting forceRefresh.</summary>
     private async Task RefreshCloudRedirectAsync(bool forceRefresh)
     {
-        CloudRedirectUnlocked = _unlocker.SelectedMode is UnlockerMode.Ost or UnlockerMode.Bst;
+        CloudRedirectUnlocked = _unlocker.SelectedMode == UnlockerMode.Ost;
         var s = await _unlocker.GetCloudRedirectStateAsync(checkUpdate: CloudRedirectUnlocked, forceRefresh);
         CloudRedirectInstalled = s.Installed;
         CloudRedirectEnabled = s.Enabled;
@@ -287,7 +284,7 @@ public partial class ModeViewModel : ObservableObject
             }
         }
 
-        // Bottom CloudRedirect add-on panel (locked unless Nightly BST is the active mode).
+        // Bottom CloudRedirect add-on panel (locked unless OST is the active mode).
         await RefreshCloudRedirectAsync(forceRefresh);
     }
 

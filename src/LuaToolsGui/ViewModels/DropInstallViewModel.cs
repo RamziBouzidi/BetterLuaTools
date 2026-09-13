@@ -241,7 +241,7 @@ public partial class DropInstallViewModel : ObservableObject
             string ok = parts.Count > 0 ? string.Format(Resources.Strings.Drop_Result_Installed, string.Join(" + ", parts)) : "";
             string bad = t.Failed > 0 ? string.Format(Resources.Strings.Drop_Result_Failed, t.Failed) : "";
             string err = t.Errors.Count > 0 ? $" {t.Errors[0]}" : "";
-            // No "restart to apply" suffix: OST/BST hot-reload luas written into config/stplug-in.
+            // No "restart to apply" suffix: OST hot-reloads luas written into config/stplug-in.
             ResultText = $"{ok}{bad}{err}".Trim();
         }
 

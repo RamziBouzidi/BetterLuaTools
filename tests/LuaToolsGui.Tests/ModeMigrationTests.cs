@@ -5,7 +5,7 @@ using Xunit;
 namespace LuaToolsGui.Tests;
 
 /// <summary>
-/// The 4-mode → 3-mode migration. Worth testing because every failure mode here is silent: a wrong
+/// The legacy-mode migration. Worth testing because every failure mode here is silent: a wrong
 /// mapping doesn't throw, it just puts the user on an unlocker they didn't choose.
 /// </summary>
 public class ModeMigrationTests
@@ -13,15 +13,15 @@ public class ModeMigrationTests
     // ── Legacy values ────────────────────────────────────────────────
 
     [Theory]
-    // Upstream OST, but the UI called it "BetterSteamTools", so BST is what these users believe
-    // they picked, and BST is what they should keep having.
+    // Legacy OST values now select the manually supplied OST installation.
     [InlineData("OpenSteamTools")]
     [InlineData("OpenSteamToolsNightly")]
-    public void BetterSteamToolsBrandedModes_BecomeBst_WithoutReonboarding(string stored)
+    [InlineData("Bst")]
+    public void LegacyOpenSteamToolsModes_BecomeOst_WithoutReonboarding(string stored)
     {
         var (mode, reset) = ModeMigration.Migrate(stored);
 
-        Assert.Equal(nameof(UnlockerMode.Bst), mode);
+        Assert.Equal(nameof(UnlockerMode.Ost), mode);
         Assert.False(reset); // they still have a mode, so don't nag them
     }
 
@@ -40,7 +40,6 @@ public class ModeMigrationTests
 
     [Theory]
     [InlineData(UnlockerMode.Ost)]
-    [InlineData(UnlockerMode.Bst)]
     [InlineData(UnlockerMode.Custom)]
     public void CurrentModes_AreUntouched(UnlockerMode mode)
     {
@@ -53,7 +52,7 @@ public class ModeMigrationTests
     /// <summary>
     /// The property the enum naming exists to guarantee. If a legacy string ever parsed as a current
     /// member, this migration could not tell "written by an old build" from "written by this build",
-    /// and a user on Ost would be silently dragged to Bst on every launch.
+    /// and a user on Ost would be silently changed on every launch.
     /// </summary>
     [Theory]
     [InlineData("SteamTools")]
@@ -69,7 +68,6 @@ public class ModeMigrationTests
     [InlineData("OpenSteamToolsNightly")]
     [InlineData("CloudRedirect")]
     [InlineData("Ost")]
-    [InlineData("Bst")]
     [InlineData("Custom")]
     [InlineData(null)]
     public void MigrationIsIdempotent(string? stored)

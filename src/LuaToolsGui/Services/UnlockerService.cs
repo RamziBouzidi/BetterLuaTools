@@ -8,7 +8,7 @@ using LuaToolsGui.Models;
 namespace LuaToolsGui.Services;
 
 /// <summary>
-/// Manages the mutually-exclusive Steam unlockers (OpenSteamTools / BetterSteamTools / Custom). Only
+/// Manages the mutually-exclusive Steam unlockers (OpenSteamTools / Custom). Only
 /// one is active at a time. Each managed mode resolves its own build, verifies files by sha256, and
 /// installs into the Steam root; Custom downloads and verifies nothing, since the user owns those
 /// files. Switching overwrites shared files but doesn't delete the previous mode's leftovers. The
@@ -23,13 +23,6 @@ public class UnlockerService(SteamService steam, SettingsService settings, Cache
     // fresh fetch (30s cooldown) for anyone who wants certainty sooner.
     private static readonly TimeSpan CacheTtl = TimeSpan.FromMinutes(5);
     private readonly Dictionary<UnlockerMode, (GithubRelease release, DateTime fetchedAt)> _releaseCache = new();
-    private readonly Dictionary<UnlockerMode, (UpdateManifest manifest, DateTime fetchedAt)> _manifestCache = new();
-
-    /// <summary>BetterSteamTools publishes its version + payload hash here instead of via the releases
-    /// API. See <see cref="FetchUpdateManifestAsync"/>.</summary>
-    private const string BstManifestUrl =
-        "https://raw.githubusercontent.com/madoiscool/BetterSteamTools/refs/heads/updates/opensteamtool/latest.toml";
-
     public IReadOnlyList<ModeDefinition> Modes { get; } =
     [
         // The nightly channel of upstream OpenSteamTool, built from main into our own OST-Nightly repo.
@@ -41,18 +34,6 @@ public class UnlockerService(SteamService steam, SettingsService settings, Cache
             FixedTag: null,
             PlaceFiles: ["dwmapi.dll", "xinput1_4.dll", "OpenSteamTool.dll"],
             ZipAssetPattern: "OpenSteamTool-{version}-Release.zip"),
-
-        // Our fork of OpenSteamTool. The dll/zip identifiers stay the upstream "OpenSteamTool" names.
-        // They're real download and file targets inherited from the fork, and renaming them breaks
-        // install. Only the mode's DisplayName is the new brand.
-        new(UnlockerMode.Bst, "BetterSteamTools",
-            Description: Resources.Strings.Mode_Desc_Bst,
-            Kind: ModeKind.Zip,
-            Owner: "madoiscool", Repo: "BetterSteamTools",
-            FixedTag: null,
-            PlaceFiles: ["dwmapi.dll", "xinput1_4.dll", "OpenSteamTool.dll"],
-            ZipAssetPattern: "OpenSteamTool-{version}-Release.zip",
-            UpdateManifestUrl: BstManifestUrl),
 
         // Opt-out: the user installs and updates their own unlocker, and we place/verify nothing.
         new(UnlockerMode.Custom, Resources.Strings.Mode_Name_Custom,
@@ -75,11 +56,11 @@ public class UnlockerService(SteamService steam, SettingsService settings, Cache
         SelectedMode is { } m ? Def(m).DisplayName : null;
 
     /// <summary>
-    /// Make sure the active OST/BST install is watching <c>config/stplug-in</c>, so luas written there
+    /// Make sure the active OST install is watching <c>config/stplug-in</c>, so luas written there
     /// hot-reload instead of needing a Steam restart.
     /// </summary>
     /// <remarks>
-    /// The app no longer tells users to restart Steam after a lua change, because OST/BST re-read any
+    /// The app no longer tells users to restart Steam after a lua change, because OST re-reads any
     /// directory listed in <c>opensteamtool.toml</c>'s <c>[lua] paths</c>. That makes this registration
     /// load-bearing rather than a nicety: previously it ran only inside <see cref="InstallAsync"/>, so a
     /// user who set their unlocker up outside this app got neither hot-reload nor restart advice.
@@ -90,7 +71,7 @@ public class UnlockerService(SteamService steam, SettingsService settings, Cache
     /// </remarks>
     public void EnsureLuaPathRegistered()
     {
-        if (SelectedMode is not (UnlockerMode.Ost or UnlockerMode.Bst)) return;
+        if (SelectedMode != UnlockerMode.Ost) return;
         if (steam.EffectivePath is not { } root) return;
         try { EnsureOpenSteamToolLuaPath(root); } catch { /* config tweak is best-effort */ }
     }
@@ -112,38 +93,9 @@ public class UnlockerService(SteamService steam, SettingsService settings, Cache
         if (root is null || !steam.IsValid)
             return new ModeState(mode, ModeStatus.Unknown, active, null);
 
-        // BST publishes version + payload hash in a raw-hosted manifest, no releases API call.
-        if (def.UpdateManifestUrl is not null)
-        {
-            var manifest = await FetchUpdateManifestAsync(def, forceRefresh, ct);
-            if (manifest is null) return new ModeState(mode, ModeStatus.Unknown, active, null);
-            return new ModeState(mode, ManifestStatus(manifest, root), active, manifest.Version);
-        }
-
-        // OST: recognise BOTH channels. An exact match against the nightly release means up to date;
-        // an exact match against the stable "ost-" mirror means the user is on stable OST, which is
-        // still OST, but this mode ships nightly, so offer them the move.
-        if (mode == UnlockerMode.Ost)
-        {
-            var (ostStatus, latestTag) = await OstStatusAsync(def, root, forceRefresh, ct);
-            return new ModeState(mode, ostStatus, active, latestTag);
-        }
-
-        return new ModeState(mode, ModeStatus.Unknown, active, null);
-    }
-
-    /// <summary>
-    /// Status for a manifest-backed mode: the manifest names one payload file and its hash (for BST,
-    /// OpenSteamTool.dll: the real change indicator; dwmapi/xinput are loaders that rarely move, so
-    /// they're placed but not compared).
-    /// </summary>
-    private static ModeStatus ManifestStatus(UpdateManifest manifest, string root)
-    {
-        string local = Path.Combine(root, manifest.File);
-        if (!File.Exists(local)) return ModeStatus.NotInstalled;
-        return AssetHash.OfFile(local).Equals(manifest.Sha256, StringComparison.OrdinalIgnoreCase)
-            ? ModeStatus.UpToDate
-            : ModeStatus.UpdateAvailable;
+        // Recognise both the nightly release and the stable OST mirror.
+        var (ostStatus, latestTag) = await OstStatusAsync(def, root, forceRefresh, ct);
+        return new ModeState(mode, ostStatus, active, latestTag);
     }
 
     /// <summary>
@@ -223,26 +175,11 @@ public class UnlockerService(SteamService steam, SettingsService settings, Cache
         if (root is null || !steam.IsValid)
             return ModeInstallResult.Fail(Resources.Strings.Err_SteamNotFound);
 
-        // Resolve the build to install: manifest-backed modes (BST) name their own version and payload
-        // hash; the rest use the same (cached) release the card's status was based on, so what installs
-        // matches what was shown.
-        GithubRelease? release = null;
-        UpdateManifest? manifest = null;
-        string? version;
-        if (def.UpdateManifestUrl is not null)
-        {
-            manifest = await FetchUpdateManifestAsync(def, forceRefresh: false, ct);
-            if (manifest is null)
-                return ModeInstallResult.Fail(Resources.Strings.Err_UpdateServerUnreachable);
-            version = manifest.Version;
-        }
-        else
-        {
-            release = await FetchReleaseAsync(def, forceRefresh: false, ct);
-            if (release is null)
-                return ModeInstallResult.Fail(Resources.Strings.Err_GithubUnreachable);
-            version = release.TagName;
-        }
+        // Resolve the release using the same cached data the status card was based on.
+        var release = await FetchReleaseAsync(def, forceRefresh: false, ct);
+        if (release is null)
+            return ModeInstallResult.Fail(Resources.Strings.Err_GithubUnreachable);
+        string version = release.TagName;
 
         string staging = Path.Combine(Path.GetTempPath(), "LuaToolsGui", "mode", Guid.NewGuid().ToString("N"));
         try
@@ -253,23 +190,11 @@ public class UnlockerService(SteamService steam, SettingsService settings, Cache
             Dictionary<string, string> staged; // filename → staged path
             string? zipDigest = null;
             {
-                // Manifest modes build the asset URL from the reported version; release modes read it
-                // off the release. Either way we land on the same "<name>-<version>-Release.zip" shape.
-                string zipUrl, zipName;
-                string? wantedZipDigest = null;
-                if (manifest is not null)
-                {
-                    zipName = (def.ZipAssetPattern ?? "").Replace("{version}", manifest.Version);
-                    zipUrl = $"https://github.com/{def.Owner}/{def.Repo}/releases/download/{manifest.Version}/{zipName}";
-                }
-                else
-                {
-                    var asset = FindZipAsset(def, release!);
-                    if (asset is null) return ModeInstallResult.Fail(Resources.Strings.Err_ReleaseMissingDownload);
-                    zipName = asset.Name;
-                    zipUrl = asset.DownloadUrl;
-                    wantedZipDigest = AssetHash.ParseDigest(asset.Digest);
-                }
+                var asset = FindZipAsset(def, release);
+                if (asset is null) return ModeInstallResult.Fail(Resources.Strings.Err_ReleaseMissingDownload);
+                string zipName = asset.Name;
+                string zipUrl = asset.DownloadUrl;
+                string? wantedZipDigest = AssetHash.ParseDigest(asset.Digest);
 
                 string zipPath = Path.Combine(staging, zipName);
                 await DownloadToFileAsync(zipUrl, zipPath, progress, ct);
@@ -283,11 +208,6 @@ public class UnlockerService(SteamService steam, SettingsService settings, Cache
                 if (missing.Count > 0)
                     return ModeInstallResult.Fail(string.Format(Resources.Strings.Err_DownloadMissingFiles, string.Join(", ", missing)));
 
-                // Manifest modes don't publish a zip digest, so verify the payload file the manifest
-                // DOES vouch for, once it's out of the archive.
-                if (manifest is not null && staged.TryGetValue(manifest.File, out string? payload)
-                    && !AssetHash.OfFile(payload).Equals(manifest.Sha256, StringComparison.OrdinalIgnoreCase))
-                    return ModeInstallResult.Fail(string.Format(Resources.Strings.Err_VerifyFailedFile, manifest.File));
             }
 
             // 2. Copy verified files into the Steam root (overwrite). Locked files → Failed (Steam running).
@@ -339,9 +259,8 @@ public class UnlockerService(SteamService steam, SettingsService settings, Cache
     /// <summary>
     /// One-time detection of an already-installed mode when none is selected yet. Hashes the on-disk
     /// DLLs against published digests, in priority order:
-    ///   1. Bst: OpenSteamTool.dll vs the BST update manifest's sha256.
-    ///   2. Ost (nightly): OpenSteamTool.dll vs any madoiscool/OST-Nightly release asset.
-    ///   3. Ost (stable): dwmapi.dll AND xinput1_4.dll vs mendy-tools tag "ost-" (loose-DLL mirror;
+    ///   1. Ost (nightly): OpenSteamTool.dll vs any madoiscool/OST-Nightly release asset.
+    ///   2. Ost (stable): dwmapi.dll AND xinput1_4.dll vs mendy-tools tag "ost-" (loose-DLL mirror;
     ///      OST ships a zip whose API digest isn't per-DLL, so we mirror the DLLs for hash-matching).
     ///      Still OST, just the other channel: GetStateAsync will offer the move to nightly.
     ///
@@ -360,24 +279,15 @@ public class UnlockerService(SteamService steam, SettingsService settings, Cache
         UnlockerMode? detected = null;
 
         // The loader DLLs (dwmapi/xinput) are often byte-identical across builds, so the payload
-        // OpenSteamTool.dll is what actually distinguishes BST from OST-nightly.
+        // OpenSteamTool.dll identifies the OST nightly build.
         string ostDll = Path.Combine(root, "OpenSteamTool.dll");
         if (File.Exists(ostDll))
         {
             string ostHash = AssetHash.OfFile(ostDll);
 
-            var bstManifest = await FetchUpdateManifestAsync(Def(UnlockerMode.Bst), forceRefresh: false, ct);
-            if (bstManifest is not null
-                && bstManifest.File.Equals("OpenSteamTool.dll", StringComparison.OrdinalIgnoreCase)
-                && ostHash.Equals(bstManifest.Sha256, StringComparison.OrdinalIgnoreCase))
-                detected = UnlockerMode.Bst;
-
-            if (detected is null)
-            {
-                var nightly = await FetchAllReleasesAsync("madoiscool", "OST-Nightly", null, ct);
-                if (nightly is not null && nightly.Any(r => AssetDigest(r, "OpenSteamTool.dll") == ostHash))
-                    detected = UnlockerMode.Ost;
-            }
+            var nightly = await FetchAllReleasesAsync("madoiscool", "OST-Nightly", null, ct);
+            if (nightly is not null && nightly.Any(r => AssetDigest(r, "OpenSteamTool.dll") == ostHash))
+                detected = UnlockerMode.Ost;
         }
 
         // Stable OST via the loose-DLL mirror. Both DLLs must be present and each must hash-match SOME
@@ -541,8 +451,7 @@ public class UnlockerService(SteamService steam, SettingsService settings, Cache
 
     // ── CloudRedirect add-on (a feature of the OpenSteamTool Nightly build) ──────────
     // Not a mutually-exclusive mode: it drops cloud_redirect.dll into the Steam root and toggles
-    // [cloud] enabled in opensteamtool.toml (parallel to how BST install writes [lua] paths). Only
-    // meaningful when the Nightly BST mode is active.
+    // [cloud] enabled in opensteamtool.toml. Only meaningful when the OST mode is active.
 
     private const string CloudRedirectDll = "cloud_redirect.dll";
     private (GithubRelease release, DateTime fetchedAt)? _crReleaseCache;
@@ -759,70 +668,6 @@ public class UnlockerService(SteamService steam, SettingsService settings, Cache
         {
             return null; // offline / rate-limited / parse error → caller maps to Unknown
         }
-    }
-
-    /// <summary>
-    /// Fetch a mode's <c>latest.toml</c> update manifest. Version + payload filename + sha256.
-    ///
-    /// This is deliberately NOT an api.github.com call: it's a raw-hosted file, so a manifest-backed
-    /// mode never spends any of the 60 req/hr unauthenticated GitHub API budget. It also gives a real
-    /// per-file hash, which is the problem the "ost-" mirror repo exists to work around for the
-    /// release-API modes. Routed through GithubProxy all the same. IsGithub covers
-    /// raw.githubusercontent.com, so blocked regions still fall through to the mirrors.
-    ///
-    /// Shares the release cache's TTL, keyed by mode.
-    /// </summary>
-    private async Task<UpdateManifest?> FetchUpdateManifestAsync(ModeDefinition def, bool forceRefresh, CancellationToken ct)
-    {
-        if (def.UpdateManifestUrl is null) return null;
-        if (!forceRefresh
-            && _manifestCache.TryGetValue(def.Mode, out var cached)
-            && DateTime.UtcNow - cached.fetchedAt < CacheTtl)
-            return cached.manifest;
-
-        try
-        {
-            using var res = await gh.SendAsync(def.UpdateManifestUrl, ct);
-            if (res is null || !res.IsSuccessStatusCode) return null;
-            var manifest = ParseUpdateManifest(await res.Content.ReadAsStringAsync(ct));
-            if (manifest is not null) _manifestCache[def.Mode] = (manifest, DateTime.UtcNow);
-            return manifest;
-        }
-        catch
-        {
-            return null; // offline / parse error → caller maps to Unknown
-        }
-    }
-
-    /// <summary>
-    /// Read the three keys we care about out of a flat <c>key = "value"</c> TOML. Hand-rolled on
-    /// purpose. The file has no tables, arrays or nesting, so a TOML package would be a dependency
-    /// bought for three lines of parsing.
-    /// </summary>
-    private static UpdateManifest? ParseUpdateManifest(string toml)
-    {
-        string? version = null, path = null, sha = null;
-        foreach (string raw in toml.Split('\n'))
-        {
-            string line = raw.Trim();
-            if (line.Length == 0 || line[0] == '#') continue;
-            int eq = line.IndexOf('=');
-            if (eq < 0) continue;
-
-            string key = line[..eq].Trim();
-            string value = line[(eq + 1)..].Trim().Trim('"');
-            switch (key)
-            {
-                case "version": version = value; break;
-                case "path": path = value; break;
-                case "sha256": sha = value; break;
-            }
-        }
-
-        if (version is null or "" || path is null or "" || sha is null or "") return null;
-        // `path` is repo-relative ("opensteamtool/v1.0.0/OpenSteamTool.dll"); only the filename matters
-        // to us, since that's what gets compared in the Steam root.
-        return new UpdateManifest(version, Path.GetFileName(path), sha.ToLowerInvariant());
     }
 
     /// <summary>Find the small Release zip (matches the pattern, excludes any Debug build).</summary>

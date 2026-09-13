@@ -125,7 +125,6 @@ public static class Strings
     public static string Mode_Cancel => Get(nameof(Mode_Cancel));
     public static string Mode_CloseSteamContinue => Get(nameof(Mode_CloseSteamContinue));
     public static string Mode_Desc_Ost => Get(nameof(Mode_Desc_Ost));
-    public static string Mode_Desc_Bst => Get(nameof(Mode_Desc_Bst));
     public static string Mode_Name_Custom => Get(nameof(Mode_Name_Custom));
     public static string Mode_Desc_Custom => Get(nameof(Mode_Desc_Custom));
     public static string Mode_CloudRedirect_Manage => Get(nameof(Mode_CloudRedirect_Manage));

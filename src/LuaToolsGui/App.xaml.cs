@@ -253,7 +253,7 @@ public partial class App : Application
         if (ModeMigration.Apply(_host.Services.GetRequiredService<SettingsService>()))
             _host.Services.GetRequiredService<CacheService>().OnboardingComplete = false;
 
-        // Point OST/BST at config/stplug-in so lua writes hot-reload. Must run AFTER the migration
+        // Point OST at config/stplug-in so lua writes hot-reload. Must run AFTER the migration
         // above, which is what makes SelectedMode parse. The app no longer tells anyone to restart
         // Steam for a lua change, so this registration is what makes that promise true — and it
         // previously only ever ran during a mode install through this app.
@@ -457,7 +457,7 @@ public partial class App : Application
                 // Custom deliberately doesn't count: a first-run user can't meaningfully choose "I'll
                 // manage it myself" before they've been shown what the options are.
                 bool configured =
-                    unlocker.SelectedMode is (UnlockerMode.Ost or UnlockerMode.Bst)
+                    unlocker.SelectedMode == UnlockerMode.Ost
                     && installer.IsInstalledLocally();
                 if (configured) cache.OnboardingComplete = true;
                 else main.Onboarding.IsOpen = true;

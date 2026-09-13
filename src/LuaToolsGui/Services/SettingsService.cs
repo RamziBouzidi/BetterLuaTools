@@ -8,7 +8,7 @@ public class AppSettings
     public string? SteamPathOverride { get; set; }
 
     // ── Unlocker mode (Mode page). User's chosen backend ────────────
-    // "Ost" | "Bst" | "Custom". Older builds wrote "SteamTools" | "OpenSteamTools" |
+    // "Ost" | "Custom". Older builds wrote "SteamTools" | "OpenSteamTools" |
     // "OpenSteamToolsNightly" | "CloudRedirect"; see ModeMigration, which rewrites those on startup.
     public string? SelectedMode { get; set; }
 
@@ -75,7 +75,7 @@ public class SettingsService
         }
     }
 
-    /// <summary>Selected unlocker backend ("SteamTools" | "OpenSteamTools"), or null if never chosen.</summary>
+    /// <summary>Selected unlocker backend ("Ost" | "Custom"), or null if never chosen.</summary>
     public string? SelectedMode
     {
         get => _settings.SelectedMode;

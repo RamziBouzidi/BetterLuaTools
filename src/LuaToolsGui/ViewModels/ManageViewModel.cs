@@ -505,7 +505,7 @@ public partial class ManageViewModel : PagedListViewModel<LuaTileViewModel>
             MessageBox.Show(string.Format(Resources.Strings.Manage_RemoveFailed_Count, failed),
                 Resources.Strings.Manage_RemoveFailed_Title, MessageBoxButton.OK, MessageBoxImage.Warning);
 
-        // No restart prompt: OST/BST watch config/stplug-in, so deleting a lua un-applies it live.
+        // No restart prompt: OST watches config/stplug-in, so deleting a lua un-applies it live.
     }
 
     /// <summary>Delete one lua file; returns false (and warns, unless silent) on failure.</summary>

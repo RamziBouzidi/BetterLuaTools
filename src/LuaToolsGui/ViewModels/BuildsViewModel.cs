@@ -1267,7 +1267,7 @@ public partial class BuildsViewModel : PagedListViewModel<LuaTileViewModel>
     /// <item><b>No Save step, and no undo, for a toggle on the Default.</b> The Default is the working
     /// copy, so flipping a switch rewrites the live lua and replaces the stored Default, discarding what
     /// was there. Keeping a state before experimenting is what "Save as preset" is for.</item>
-    /// <item><b>No restart prompt anywhere on this page.</b> OST/BST watch <c>config/stplug-in</c>, so
+    /// <item><b>No restart prompt anywhere on this page.</b> OST watches <c>config/stplug-in</c>, so
     /// rewriting the live lua applies it immediately. <see cref="Apply"/> and <see cref="SaveEdit"/> used
     /// to prompt; none of them do now, and a modal on every switch flip would have been unusable anyway.</item>
     /// </list>

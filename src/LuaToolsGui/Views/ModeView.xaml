@@ -208,8 +208,8 @@
                 <!-- Divider between the scrolling mode cards and the docked add-on. -->
                 <Border Height="1" Margin="0,0,0,14" Background="#1FFFFFFF" />
 
-                <!-- CloudRedirect add-on: a feature of the Nightly BST build. Locked (dimmed, buttons
-                      disabled) unless BetterSteamTools Nightly is the active mode. -->
+                <!-- CloudRedirect add-on: a feature of the Nightly OST build. Locked (dimmed, buttons
+                      disabled) unless OpenSteamTools is the active mode. -->
                 <Border
                     Margin="0,0,0,0"
                     Padding="18"

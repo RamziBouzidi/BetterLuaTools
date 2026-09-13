@@ -7,7 +7,7 @@ namespace LuaToolsGui.ViewModels;
 
 /// <summary>
 /// First-run welcome overlay. Shown once (gated by <see cref="CacheService.OnboardingComplete"/>) over the
-/// whole app: offers Discord sign-in, "apply recommended settings" (BetterSteamTools + FastFetch) and
+/// whole app: offers Discord sign-in, "apply recommended settings" (OpenSteamTools + FastFetch) and
 /// "install the plugin", then applies the chosen actions on "Let's go!" and dismisses.
 /// </summary>
 public partial class OnboardingViewModel : ObservableObject
@@ -102,18 +102,16 @@ public partial class OnboardingViewModel : ObservableObject
         _toast.Show(Resources.Strings.Onboarding_Title, Resources.Strings.Onboarding_Applying);
         try
         {
-            // Close Steam ONCE up front so both installs run against a stopped Steam, then relaunch it once
-            // at the end. Avoids the double restart of letting each installer manage Steam separately.
-            // (The plugin installer only relaunches Steam if it was up when it ran; since we pre-stopped it,
-            // it won't, and our StartSteam below is the single relaunch.)
-            await Task.Run(_steam.StopSteam);
+            // The unlocker files are supplied manually, so applying the recommendation only selects OST.
+            // Stop/restart Steam only when the separate LuaTools plugin actually needs installation.
+            if (installPlugin)
+                await Task.Run(_steam.StopSteam);
 
             if (applyRecommended)
             {
                 _settings.FastFetch = true;
-                var result = await _unlocker.InstallAsync(UnlockerMode.Bst); // the Recommended mode
-                if (!result.Success)
-                    _toast.Show(Resources.Strings.Onboarding_Title, result.Error ?? "", error: true);
+                _settings.SelectedMode = UnlockerMode.Ost.ToString();
+                _unlocker.EnsureLuaPathRegistered();
             }
 
             if (installPlugin)
@@ -123,7 +121,8 @@ public partial class OnboardingViewModel : ObservableObject
                     _toast.Show(Resources.Strings.Onboarding_Title, error ?? "", error: true);
             }
 
-            await Task.Run(_steam.StartSteam);
+            if (installPlugin)
+                await Task.Run(_steam.StartSteam);
         }
         catch (Exception ex)
         {

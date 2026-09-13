@@ -16,7 +16,6 @@ namespace LuaToolsGui.Models;
 public enum UnlockerMode
 {
     Ost,     // OpenSteamTools: the nightly channel (madoiscool/OST-Nightly)
-    Bst,     // BetterSteamTools: the fork (madoiscool/BetterSteamTools)
     Custom,  // the user manages their own unlocker; the app places nothing
 }
 
@@ -50,17 +49,7 @@ public sealed record ModeDefinition(
     string? FixedTag,        // e.g. "ST"; null → use the repo's latest release
     string[] PlaceFiles,     // files that end up in the Steam root (for status/verify)
     string? ZipAssetPattern, // e.g. "OpenSteamTool-{version}-Release.zip"; null unless Kind == Zip
-    // When set, version + hash come from this raw-hosted TOML instead of the GitHub releases API, and
-    // the zip URL is built from the version it reports. Costs no api.github.com call, so the mode is
-    // immune to the 60 req/hr unauthenticated limit. See UnlockerService.FetchUpdateManifestAsync.
-    string? UpdateManifestUrl = null,
     string? HiddenUnlessFile = null); // if set, the card is hidden unless this file exists in the Steam root (or the mode is active)
-
-/// <summary>One published build, as described by a mode's <c>latest.toml</c> update manifest.</summary>
-/// <param name="Version">Release tag, e.g. "v1.0.0". Also builds the zip download URL.</param>
-/// <param name="File">Bare filename the hash belongs to, e.g. "OpenSteamTool.dll".</param>
-/// <param name="Sha256">Lowercase hex digest of that file.</param>
-public sealed record UpdateManifest(string Version, string File, string Sha256);
 
 // ── GitHub release API DTOs ─────────────────────────────────────────
 public sealed class GithubRelease
@@ -90,7 +79,7 @@ public sealed record ModeState(
     bool IsActive,           // is this the currently-selected (active) mode
     string? LatestVersion);  // resolved release tag (for display)
 
-/// <summary>State of the CloudRedirect add-on (a feature of both the OST nightly and BST builds), derived
+/// <summary>State of the CloudRedirect add-on (a feature of the OST nightly build), derived
 /// from disk (cloud_redirect.dll presence + [cloud] enabled in opensteamtool.toml) and the latest
 /// CloudRedirect release.</summary>
 public sealed record CloudRedirectAddonState(

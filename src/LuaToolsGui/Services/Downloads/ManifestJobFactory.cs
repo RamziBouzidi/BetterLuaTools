@@ -532,7 +532,7 @@ public class ManifestJobFactory(
     /// </summary>
     /// <remarks>
     /// This used to call <c>SteamService.RestartSteam()</c> unconditionally and without asking, which
-    /// killed Steam and every running game on each fix install. OpenSteamTools/BetterSteamTools watch
+    /// killed Steam and every running game on each fix install. OpenSteamTools watches
     /// the lua directories listed in <c>opensteamtool.toml</c>'s <c>[lua] paths</c> — which includes the
     /// <c>config/stplug-in</c> we just wrote to — so the write itself applies the change live.
     /// </remarks>
