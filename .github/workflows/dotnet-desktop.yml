@@ -1,34 +1,32 @@
-name: Build and Test .NET Project
+name: Build LuaTools
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
-    # 1. Checkout your code from GitHub
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # 2. Setup the .NET SDK
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '8.0.x' # Set this to your target version (e.g. 6.0.x, 8.0.x)
+        dotnet-version: '8.0.x'
 
-    # 3. Restore dependencies
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore LuaToolsGui.sln
 
-    # 4. Build the project
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build LuaToolsGui.sln --configuration Release --no-restore
 
-    # 5. Run unit tests (optional)
-    - name: Test
-      run: dotnet test --no-restore --verbosity normal
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: LuaTools-Release
+        path: src/LuaToolsGui/bin/Release/net8.0-windows/
