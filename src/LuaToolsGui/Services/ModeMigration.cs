@@ -48,7 +48,7 @@ public static class ModeMigration
         return stored switch
         {
             // Both legacy OpenSteamTools values refer to the manually supplied OST installation.
-            "OpenSteamTools" or "OpenSteamToolsNightly" or "Bst" => (UnlockerMode.Ost.ToString(), false),
+            "OpenSteamTools" or "OpenSteamToolsNightly" => (UnlockerMode.Ost.ToString(), false),
 
             // SteamTools and the CloudRedirect fix are retired with nothing to map onto. Clear the mode
             // and send them back through onboarding to choose deliberately. Anything else unrecognised

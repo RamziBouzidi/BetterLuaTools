@@ -148,7 +148,6 @@
   <data name="Mode_Confirm_Body" xml:space="preserve"><value>ファイルを変更できるようにSteamを終了し、その後自動的に再起動します。実行中のゲームやダウンロードはすべて停止します。</value></data>
   <data name="Mode_Cancel" xml:space="preserve"><value>キャンセル</value></data>
   <data name="Mode_CloseSteamContinue" xml:space="preserve"><value>Steamを閉じて続行</value></data>
-  <data name="Mode_Desc_Bst" xml:space="preserve"><value>OpenSteamTools のオープンソースフォーク。LuaTools チームが積極的にメンテナンスし、修正や新機能を追加しています！</value></data>
   <data name="Mode_CloudRedirect_Manage" xml:space="preserve"><value>管理</value></data>
   <data name="Mode_CloudRedirect_LaunchFailed" xml:space="preserve"><value>CloudRedirect をダウンロードまたは起動できませんでした。</value></data>
   <data name="Mode_Desc_Ost" xml:space="preserve"><value>最新ソースからビルドされた OpenSteamTools のナイトリー版。最新の修正が入りますが、安定性は低めの場合があります。</value></data>
@@ -157,8 +156,8 @@
   <data name="Mode_Name_Custom" xml:space="preserve"><value>カスタムアンロッカー</value></data>
   <data name="Mode_Experimental" xml:space="preserve"><value>実験的</value></data>
   <data name="Mode_CloudRedirectSupport" xml:space="preserve"><value>CloudRedirect 対応</value></data>
-  <data name="Mode_CloudRedirect_AddonDesc" xml:space="preserve"><value>Google Drive / OneDrive / Cloudflare R2 など、サードパーティのストレージを使ってネイティブの Steam Cloud サポートを復活させます。現在は OpenSteamTools / BetterSteamTools のみ対応。有効化後は「管理」をクリックして設定し、Steam を再起動するのを忘れずに！</value></data>
-  <data name="Mode_CloudRedirect_Locked" xml:space="preserve"><value>CloudRedirect を使うには OpenSteamTools / BetterSteamTools を選択してください。</value></data>
+  <data name="Mode_CloudRedirect_AddonDesc" xml:space="preserve"><value>Google Drive / OneDrive / Cloudflare R2 など、サードパーティのストレージを使ってネイティブの Steam Cloud サポートを復活させます。現在は OpenSteamTools のみ対応。有効化後は「管理」をクリックして設定し、Steam を再起動するのを忘れずに！</value></data>
+  <data name="Mode_CloudRedirect_Locked" xml:space="preserve"><value>CloudRedirect を使うには OpenSteamTools を選択してください。</value></data>
   <data name="Mode_CloudRedirect_Enable" xml:space="preserve"><value>有効化</value></data>
   <data name="Mode_CloudRedirect_Disable" xml:space="preserve"><value>無効化</value></data>
   <data name="Mode_CloudRedirect_Status_Enabled" xml:space="preserve"><value>有効です。</value></data>
@@ -172,7 +171,7 @@
   <data name="Onboarding_SignIn_Blurb" xml:space="preserve"><value>サインインして、ゲームや修正の追加を解放しましょう。</value></data>
   <data name="Onboarding_SignedIn" xml:space="preserve"><value>サインイン済み ✓</value></data>
   <data name="Onboarding_Recommended_Title" xml:space="preserve"><value>推奨設定を適用</value></data>
-  <data name="Onboarding_Recommended_Detail" xml:space="preserve"><value>モード: BetterSteamTools · FastFetch オン</value></data>
+  <data name="Onboarding_Recommended_Detail" xml:space="preserve"><value>モード: OpenSteamTools · FastFetch オン</value></data>
   <data name="Onboarding_Plugin_Title" xml:space="preserve"><value>人気のプラグインをインストール</value></data>
   <data name="Onboarding_Plugin_Detail" xml:space="preserve"><value>Steam ストアページに「Add via LuaTools」ボタンを追加します。</value></data>
   <data name="Onboarding_Yes" xml:space="preserve"><value>はい、お願いします</value></data>

@@ -148,7 +148,6 @@
   <data name="Mode_Confirm_Body" xml:space="preserve"><value>Dosyalarının değiştirilebilmesi için Steam kapatılacak, ardından otomatik olarak yeniden başlatılacaktır. Çalışan tüm oyunlar veya indirmeler duracaktır.</value></data>
   <data name="Mode_Cancel" xml:space="preserve"><value>İptal</value></data>
   <data name="Mode_CloseSteamContinue" xml:space="preserve"><value>Steam'i kapat ve devam et</value></data>
-  <data name="Mode_Desc_Bst" xml:space="preserve"><value>LuaTools ekibi tarafından aktif olarak geliştirilen açık kaynaklı bir OpenSteamTools fork'u. Düzeltmeler ve yeni özelliklerle!</value></data>
   <data name="Mode_CloudRedirect_Manage" xml:space="preserve"><value>Yönet</value></data>
   <data name="Mode_CloudRedirect_LaunchFailed" xml:space="preserve"><value>CloudRedirect indirilemedi veya başlatılamadı.</value></data>
   <data name="Mode_Desc_Ost" xml:space="preserve"><value>OpenSteamTools'un en son kaynaktan alınan gecelik derlemesi. En yeni düzeltmeler, ancak daha az kararlı olabilir.</value></data>
@@ -157,8 +156,8 @@
   <data name="Mode_Name_Custom" xml:space="preserve"><value>Özel kilit açıcı</value></data>
   <data name="Mode_Experimental" xml:space="preserve"><value>DENEYSEL</value></data>
   <data name="Mode_CloudRedirectSupport" xml:space="preserve"><value>CLOUDREDIRECT DESTEĞİ</value></data>
-  <data name="Mode_CloudRedirect_AddonDesc" xml:space="preserve"><value>Google Drive / OneDrive / Cloudflare R2 gibi üçüncü taraf depolama sağlayıcıları aracılığıyla yerleşik Steam Cloud desteğini geri getirir. Şu anda yalnızca OpenSteamTools / BetterSteamTools ile uyumludur. Etkinleştirdikten sonra "Yönet"e tıklayarak yapılandırmayı ve ardından Steam'i yeniden başlatmayı unutmayın!</value></data>
-  <data name="Mode_CloudRedirect_Locked" xml:space="preserve"><value>CloudRedirect'i kullanmak için OpenSteamTools / BetterSteamTools'u seçin.</value></data>
+  <data name="Mode_CloudRedirect_AddonDesc" xml:space="preserve"><value>Google Drive / OneDrive / Cloudflare R2 gibi üçüncü taraf depolama sağlayıcıları aracılığıyla yerleşik Steam Cloud desteğini geri getirir. Şu anda yalnızca OpenSteamTools ile uyumludur. Etkinleştirdikten sonra "Yönet"e tıklayarak yapılandırmayı ve ardından Steam'i yeniden başlatmayı unutmayın!</value></data>
+  <data name="Mode_CloudRedirect_Locked" xml:space="preserve"><value>CloudRedirect'i kullanmak için OpenSteamTools'u seçin.</value></data>
   <data name="Mode_CloudRedirect_Enable" xml:space="preserve"><value>Etkinleştir</value></data>
   <data name="Mode_CloudRedirect_Disable" xml:space="preserve"><value>Devre dışı bırak</value></data>
   <data name="Mode_CloudRedirect_Status_Enabled" xml:space="preserve"><value>Etkin.</value></data>
@@ -172,7 +171,7 @@
   <data name="Onboarding_SignIn_Blurb" xml:space="preserve"><value>Oyun ve düzeltme eklemeyi açmak için giriş yapın.</value></data>
   <data name="Onboarding_SignedIn" xml:space="preserve"><value>Giriş yapıldı ✓</value></data>
   <data name="Onboarding_Recommended_Title" xml:space="preserve"><value>Önerilen ayarları uygula</value></data>
-  <data name="Onboarding_Recommended_Detail" xml:space="preserve"><value>Mod: BetterSteamTools · FastFetch açık</value></data>
+  <data name="Onboarding_Recommended_Detail" xml:space="preserve"><value>Mod: OpenSteamTools · FastFetch açık</value></data>
   <data name="Onboarding_Plugin_Title" xml:space="preserve"><value>Ünlü eklentimizi yükle</value></data>
   <data name="Onboarding_Plugin_Detail" xml:space="preserve"><value>Steam mağaza sayfalarına "Add via LuaTools" düğmesini ekler.</value></data>
   <data name="Onboarding_Yes" xml:space="preserve"><value>Evet, lütfen</value></data>

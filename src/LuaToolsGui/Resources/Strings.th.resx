@@ -148,7 +148,6 @@
   <data name="Mode_Confirm_Body" xml:space="preserve"><value>Steam จะถูกปิดเพื่อให้สามารถเปลี่ยนไฟล์ได้ จากนั้นจะรีสตาร์ทโดยอัตโนมัติ เกมหรือการดาวน์โหลดที่กำลังทำงานทั้งหมดจะหยุดลง</value></data>
   <data name="Mode_Cancel" xml:space="preserve"><value>ยกเลิก</value></data>
   <data name="Mode_CloseSteamContinue" xml:space="preserve"><value>ปิด Steam และดำเนินการต่อ</value></data>
-  <data name="Mode_Desc_Bst" xml:space="preserve"><value>ฟอร์กโอเพนซอร์สของ OpenSteamTools ที่ทีม LuaTools ดูแลอย่างต่อเนื่อง พร้อมการแก้ไขและฟีเจอร์ใหม่ ๆ!</value></data>
   <data name="Mode_CloudRedirect_Manage" xml:space="preserve"><value>จัดการ</value></data>
   <data name="Mode_CloudRedirect_LaunchFailed" xml:space="preserve"><value>ไม่สามารถดาวน์โหลดหรือเปิด CloudRedirect ได้</value></data>
   <data name="Mode_Desc_Ost" xml:space="preserve"><value>บิลด์รายคืนของ OpenSteamTools จากซอร์สล่าสุด มีการแก้ไขล่าสุด แต่อาจเสถียรน้อยกว่า</value></data>
@@ -157,8 +156,8 @@
   <data name="Mode_Name_Custom" xml:space="preserve"><value>ตัวปลดล็อกของคุณเอง</value></data>
   <data name="Mode_Experimental" xml:space="preserve"><value>ทดลอง</value></data>
   <data name="Mode_CloudRedirectSupport" xml:space="preserve"><value>รองรับ CloudRedirect</value></data>
-  <data name="Mode_CloudRedirect_AddonDesc" xml:space="preserve"><value>นำการรองรับ Steam Cloud ในตัวกลับมาผ่านผู้ให้บริการพื้นที่จัดเก็บภายนอก เช่น Google Drive / OneDrive / Cloudflare R2 และอื่น ๆ ขณะนี้ใช้ได้กับ OpenSteamTools / BetterSteamTools เท่านั้น อย่าลืมตั้งค่าด้วยการคลิก "จัดการ" หลังเปิดใช้งาน แล้วรีสตาร์ท Steam!</value></data>
-  <data name="Mode_CloudRedirect_Locked" xml:space="preserve"><value>เลือก OpenSteamTools / BetterSteamTools เพื่อใช้ CloudRedirect</value></data>
+  <data name="Mode_CloudRedirect_AddonDesc" xml:space="preserve"><value>นำการรองรับ Steam Cloud ในตัวกลับมาผ่านผู้ให้บริการพื้นที่จัดเก็บภายนอก เช่น Google Drive / OneDrive / Cloudflare R2 และอื่น ๆ ขณะนี้ใช้ได้กับ OpenSteamTools เท่านั้น อย่าลืมตั้งค่าด้วยการคลิก "จัดการ" หลังเปิดใช้งาน แล้วรีสตาร์ท Steam!</value></data>
+  <data name="Mode_CloudRedirect_Locked" xml:space="preserve"><value>เลือก OpenSteamTools เพื่อใช้ CloudRedirect</value></data>
   <data name="Mode_CloudRedirect_Enable" xml:space="preserve"><value>เปิดใช้งาน</value></data>
   <data name="Mode_CloudRedirect_Disable" xml:space="preserve"><value>ปิดใช้งาน</value></data>
   <data name="Mode_CloudRedirect_Status_Enabled" xml:space="preserve"><value>เปิดใช้งานอยู่</value></data>
@@ -172,7 +171,7 @@
   <data name="Onboarding_SignIn_Blurb" xml:space="preserve"><value>ลงชื่อเข้าใช้เพื่อปลดล็อกการเพิ่มเกมและแพตช์แก้ไข</value></data>
   <data name="Onboarding_SignedIn" xml:space="preserve"><value>ลงชื่อเข้าใช้แล้ว ✓</value></data>
   <data name="Onboarding_Recommended_Title" xml:space="preserve"><value>ใช้การตั้งค่าที่แนะนำ</value></data>
-  <data name="Onboarding_Recommended_Detail" xml:space="preserve"><value>โหมด: BetterSteamTools · เปิด FastFetch</value></data>
+  <data name="Onboarding_Recommended_Detail" xml:space="preserve"><value>โหมด: OpenSteamTools · เปิด FastFetch</value></data>
   <data name="Onboarding_Plugin_Title" xml:space="preserve"><value>ติดตั้งปลั๊กอินชื่อดังของเรา</value></data>
   <data name="Onboarding_Plugin_Detail" xml:space="preserve"><value>เพิ่มปุ่ม "Add via LuaTools" ในหน้าร้านค้า Steam</value></data>
   <data name="Onboarding_Yes" xml:space="preserve"><value>ตกลง</value></data>

@@ -172,7 +172,7 @@
   <data name="Mode_UserManaged" xml:space="preserve"><value>You're on your own</value></data>
   <data name="Mode_Experimental" xml:space="preserve"><value>EXPERIMENTAL</value></data>
   <data name="Mode_CloudRedirectSupport" xml:space="preserve"><value>CLOUDREDIRECT SUPPORT</value></data>
-  <data name="Mode_CloudRedirect_AddonDesc" xml:space="preserve"><value>Brings back native Steam Cloud support via third-party storage providers such as Google Drive / OneDrive / Cloudflare R2 + more. Only compatible with OpenSteamTools / BetterSteamTools at the moment. Don't forget to configure it by clicking "Manage" after enabling, then restart Steam!</value></data>
+  <data name="Mode_CloudRedirect_AddonDesc" xml:space="preserve"><value>Brings back native Steam Cloud support via third-party storage providers such as Google Drive / OneDrive / Cloudflare R2 + more. Only compatible with OpenSteamTools at the moment. Don't forget to configure it by clicking "Manage" after enabling, then restart Steam!</value></data>
   <data name="Mode_CloudRedirect_Locked" xml:space="preserve"><value>Select OpenSteamTools to use CloudRedirect.</value></data>
   <data name="Mode_CloudRedirect_Enable" xml:space="preserve"><value>Enable</value></data>
   <data name="Mode_CloudRedirect_Disable" xml:space="preserve"><value>Disable</value></data>

@@ -148,7 +148,6 @@
   <data name="Mode_Confirm_Body" xml:space="preserve"><value>Steam sẽ được đóng để có thể thay đổi các tệp của nó, sau đó tự động khởi động lại. Mọi trò chơi hoặc lượt tải đang chạy sẽ dừng lại.</value></data>
   <data name="Mode_Cancel" xml:space="preserve"><value>Hủy</value></data>
   <data name="Mode_CloseSteamContinue" xml:space="preserve"><value>Đóng Steam và tiếp tục</value></data>
-  <data name="Mode_Desc_Bst" xml:space="preserve"><value>Một bản fork mã nguồn mở của OpenSteamTools, được nhóm LuaTools duy trì tích cực. Mang đến các bản sửa lỗi và tính năng mới!</value></data>
   <data name="Mode_CloudRedirect_Manage" xml:space="preserve"><value>Quản lý</value></data>
   <data name="Mode_CloudRedirect_LaunchFailed" xml:space="preserve"><value>Không thể tải xuống hoặc khởi chạy CloudRedirect.</value></data>
   <data name="Mode_Desc_Ost" xml:space="preserve"><value>Bản dựng nightly của OpenSteamTools từ mã nguồn mới nhất. Các bản sửa lỗi mới nhất, nhưng có thể kém ổn định hơn.</value></data>
@@ -157,8 +156,8 @@
   <data name="Mode_Name_Custom" xml:space="preserve"><value>Trình mở khóa tùy chỉnh</value></data>
   <data name="Mode_Experimental" xml:space="preserve"><value>THỬ NGHIỆM</value></data>
   <data name="Mode_CloudRedirectSupport" xml:space="preserve"><value>HỖ TRỢ CLOUDREDIRECT</value></data>
-  <data name="Mode_CloudRedirect_AddonDesc" xml:space="preserve"><value>Mang lại hỗ trợ Steam Cloud gốc thông qua các nhà cung cấp lưu trữ bên thứ ba như Google Drive / OneDrive / Cloudflare R2 và nhiều hơn nữa. Hiện chỉ tương thích với OpenSteamTools / BetterSteamTools. Đừng quên cấu hình bằng cách nhấp "Quản lý" sau khi bật, rồi khởi động lại Steam!</value></data>
-  <data name="Mode_CloudRedirect_Locked" xml:space="preserve"><value>Chọn OpenSteamTools / BetterSteamTools để dùng CloudRedirect.</value></data>
+  <data name="Mode_CloudRedirect_AddonDesc" xml:space="preserve"><value>Mang lại hỗ trợ Steam Cloud gốc thông qua các nhà cung cấp lưu trữ bên thứ ba như Google Drive / OneDrive / Cloudflare R2 và nhiều hơn nữa. Hiện chỉ tương thích với OpenSteamTools. Đừng quên cấu hình bằng cách nhấp "Quản lý" sau khi bật, rồi khởi động lại Steam!</value></data>
+  <data name="Mode_CloudRedirect_Locked" xml:space="preserve"><value>Chọn OpenSteamTools để dùng CloudRedirect.</value></data>
   <data name="Mode_CloudRedirect_Enable" xml:space="preserve"><value>Bật</value></data>
   <data name="Mode_CloudRedirect_Disable" xml:space="preserve"><value>Tắt</value></data>
   <data name="Mode_CloudRedirect_Status_Enabled" xml:space="preserve"><value>Đã bật.</value></data>
@@ -172,7 +171,7 @@
   <data name="Onboarding_SignIn_Blurb" xml:space="preserve"><value>Đăng nhập để mở khóa thêm trò chơi và bản sửa lỗi.</value></data>
   <data name="Onboarding_SignedIn" xml:space="preserve"><value>Đã đăng nhập ✓</value></data>
   <data name="Onboarding_Recommended_Title" xml:space="preserve"><value>Áp dụng cài đặt được đề xuất</value></data>
-  <data name="Onboarding_Recommended_Detail" xml:space="preserve"><value>Chế độ: BetterSteamTools · Bật FastFetch</value></data>
+  <data name="Onboarding_Recommended_Detail" xml:space="preserve"><value>Chế độ: OpenSteamTools · Bật FastFetch</value></data>
   <data name="Onboarding_Plugin_Title" xml:space="preserve"><value>Cài đặt plugin nổi tiếng của chúng tôi</value></data>
   <data name="Onboarding_Plugin_Detail" xml:space="preserve"><value>Thêm nút "Add via LuaTools" vào các trang cửa hàng Steam.</value></data>
   <data name="Onboarding_Yes" xml:space="preserve"><value>Vâng</value></data>

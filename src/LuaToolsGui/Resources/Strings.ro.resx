@@ -148,7 +148,6 @@
   <data name="Mode_Confirm_Body" xml:space="preserve"><value>Steam va fi închis pentru a putea fi modificate fișierele sale, apoi repornit automat. Toate jocurile sau descărcările în curs se vor opri.</value></data>
   <data name="Mode_Cancel" xml:space="preserve"><value>Anulează</value></data>
   <data name="Mode_CloseSteamContinue" xml:space="preserve"><value>Închide Steam și continuă</value></data>
-  <data name="Mode_Desc_Bst" xml:space="preserve"><value>Un fork open source al OpenSteamTools, întreținut activ de echipa LuaTools. Cu corecții și funcții noi!</value></data>
   <data name="Mode_CloudRedirect_Manage" xml:space="preserve"><value>Gestionează</value></data>
   <data name="Mode_CloudRedirect_LaunchFailed" xml:space="preserve"><value>Nu s-a putut descărca sau lansa CloudRedirect.</value></data>
   <data name="Mode_Desc_Ost" xml:space="preserve"><value>Versiune nightly a OpenSteamTools din cel mai recent cod sursă. Cele mai noi remedieri, dar poate fi mai puțin stabilă.</value></data>
@@ -157,8 +156,8 @@
   <data name="Mode_Name_Custom" xml:space="preserve"><value>Deblocator personalizat</value></data>
   <data name="Mode_Experimental" xml:space="preserve"><value>EXPERIMENTAL</value></data>
   <data name="Mode_CloudRedirectSupport" xml:space="preserve"><value>SUPORT CLOUDREDIRECT</value></data>
-  <data name="Mode_CloudRedirect_AddonDesc" xml:space="preserve"><value>Readuce suportul nativ Steam Cloud prin furnizori de stocare terți precum Google Drive / OneDrive / Cloudflare R2 și altele. Momentan compatibil doar cu OpenSteamTools / BetterSteamTools. Nu uita să îl configurezi apăsând pe "Gestionează" după activare, apoi repornește Steam!</value></data>
-  <data name="Mode_CloudRedirect_Locked" xml:space="preserve"><value>Selectează OpenSteamTools / BetterSteamTools pentru a folosi CloudRedirect.</value></data>
+  <data name="Mode_CloudRedirect_AddonDesc" xml:space="preserve"><value>Readuce suportul nativ Steam Cloud prin furnizori de stocare terți precum Google Drive / OneDrive / Cloudflare R2 și altele. Momentan compatibil doar cu OpenSteamTools. Nu uita să îl configurezi apăsând pe "Gestionează" după activare, apoi repornește Steam!</value></data>
+  <data name="Mode_CloudRedirect_Locked" xml:space="preserve"><value>Selectează OpenSteamTools pentru a folosi CloudRedirect.</value></data>
   <data name="Mode_CloudRedirect_Enable" xml:space="preserve"><value>Activează</value></data>
   <data name="Mode_CloudRedirect_Disable" xml:space="preserve"><value>Dezactivează</value></data>
   <data name="Mode_CloudRedirect_Status_Enabled" xml:space="preserve"><value>Activat.</value></data>
@@ -172,7 +171,7 @@
   <data name="Onboarding_SignIn_Blurb" xml:space="preserve"><value>Conectează-te pentru a debloca adăugarea de jocuri și remedieri.</value></data>
   <data name="Onboarding_SignedIn" xml:space="preserve"><value>Conectat ✓</value></data>
   <data name="Onboarding_Recommended_Title" xml:space="preserve"><value>Aplică setările recomandate</value></data>
-  <data name="Onboarding_Recommended_Detail" xml:space="preserve"><value>Mod: BetterSteamTools · FastFetch activat</value></data>
+  <data name="Onboarding_Recommended_Detail" xml:space="preserve"><value>Mod: OpenSteamTools · FastFetch activat</value></data>
   <data name="Onboarding_Plugin_Title" xml:space="preserve"><value>Instalează faimosul nostru plugin</value></data>
   <data name="Onboarding_Plugin_Detail" xml:space="preserve"><value>Adaugă butonul „Add via LuaTools” pe paginile din magazinul Steam.</value></data>
   <data name="Onboarding_Yes" xml:space="preserve"><value>Da, te rog</value></data>

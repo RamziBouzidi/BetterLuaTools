@@ -148,7 +148,6 @@
   <data name="Mode_Confirm_Body" xml:space="preserve"><value>Steam lukkes, så dets filer kan ændres, og genstartes derefter automatisk. Alle kørende spil eller downloads stopper.</value></data>
   <data name="Mode_Cancel" xml:space="preserve"><value>Annuller</value></data>
   <data name="Mode_CloseSteamContinue" xml:space="preserve"><value>Luk Steam og fortsæt</value></data>
-  <data name="Mode_Desc_Bst" xml:space="preserve"><value>En open source-fork af OpenSteamTools, som vedligeholdes aktivt af LuaTools-teamet. Med rettelser og nye funktioner!</value></data>
   <data name="Mode_CloudRedirect_Manage" xml:space="preserve"><value>Administrer</value></data>
   <data name="Mode_CloudRedirect_LaunchFailed" xml:space="preserve"><value>Kunne ikke downloade eller starte CloudRedirect.</value></data>
   <data name="Mode_Desc_Ost" xml:space="preserve"><value>Natlig build af OpenSteamTools fra den nyeste kildekode. Nyeste rettelser, men kan være mindre stabil.</value></data>
@@ -157,8 +156,8 @@
   <data name="Mode_Name_Custom" xml:space="preserve"><value>Egen unlocker</value></data>
   <data name="Mode_Experimental" xml:space="preserve"><value>EKSPERIMENTEL</value></data>
   <data name="Mode_CloudRedirectSupport" xml:space="preserve"><value>CLOUDREDIRECT-UNDERSTØTTELSE</value></data>
-  <data name="Mode_CloudRedirect_AddonDesc" xml:space="preserve"><value>Bringer indbygget Steam Cloud-understøttelse tilbage via tredjeparts lagringsudbydere som Google Drive / OneDrive / Cloudflare R2 med flere. Kun kompatibel med OpenSteamTools / BetterSteamTools i øjeblikket. Husk at konfigurere det ved at klikke på "Administrer" efter aktivering, og genstart derefter Steam!</value></data>
-  <data name="Mode_CloudRedirect_Locked" xml:space="preserve"><value>Vælg OpenSteamTools / BetterSteamTools for at bruge CloudRedirect.</value></data>
+  <data name="Mode_CloudRedirect_AddonDesc" xml:space="preserve"><value>Bringer indbygget Steam Cloud-understøttelse tilbage via tredjeparts lagringsudbydere som Google Drive / OneDrive / Cloudflare R2 med flere. Kun kompatibel med OpenSteamTools i øjeblikket. Husk at konfigurere det ved at klikke på "Administrer" efter aktivering, og genstart derefter Steam!</value></data>
+  <data name="Mode_CloudRedirect_Locked" xml:space="preserve"><value>Vælg OpenSteamTools for at bruge CloudRedirect.</value></data>
   <data name="Mode_CloudRedirect_Enable" xml:space="preserve"><value>Aktivér</value></data>
   <data name="Mode_CloudRedirect_Disable" xml:space="preserve"><value>Deaktivér</value></data>
   <data name="Mode_CloudRedirect_Status_Enabled" xml:space="preserve"><value>Aktiveret.</value></data>
@@ -172,7 +171,7 @@
   <data name="Onboarding_SignIn_Blurb" xml:space="preserve"><value>Log ind for at låse op for tilføjelse af spil og rettelser.</value></data>
   <data name="Onboarding_SignedIn" xml:space="preserve"><value>Logget ind ✓</value></data>
   <data name="Onboarding_Recommended_Title" xml:space="preserve"><value>Anvend anbefalede indstillinger</value></data>
-  <data name="Onboarding_Recommended_Detail" xml:space="preserve"><value>Tilstand: BetterSteamTools · FastFetch til</value></data>
+  <data name="Onboarding_Recommended_Detail" xml:space="preserve"><value>Tilstand: OpenSteamTools · FastFetch til</value></data>
   <data name="Onboarding_Plugin_Title" xml:space="preserve"><value>Installer vores berømte plugin</value></data>
   <data name="Onboarding_Plugin_Detail" xml:space="preserve"><value>Tilføjer knappen "Add via LuaTools" til Steam-butikssider.</value></data>
   <data name="Onboarding_Yes" xml:space="preserve"><value>Ja tak</value></data>

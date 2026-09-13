@@ -16,7 +16,6 @@ public class ModeMigrationTests
     // Legacy OST values now select the manually supplied OST installation.
     [InlineData("OpenSteamTools")]
     [InlineData("OpenSteamToolsNightly")]
-    [InlineData("Bst")]
     public void LegacyOpenSteamToolsModes_BecomeOst_WithoutReonboarding(string stored)
     {
         var (mode, reset) = ModeMigration.Migrate(stored);

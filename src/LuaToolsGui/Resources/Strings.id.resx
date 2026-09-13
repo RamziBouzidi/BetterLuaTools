@@ -148,7 +148,6 @@
   <data name="Mode_Confirm_Body" xml:space="preserve"><value>Steam akan ditutup agar file-nya dapat diubah, lalu dimulai ulang secara otomatis. Semua gim atau unduhan yang berjalan akan berhenti.</value></data>
   <data name="Mode_Cancel" xml:space="preserve"><value>Batal</value></data>
   <data name="Mode_CloseSteamContinue" xml:space="preserve"><value>Tutup Steam dan lanjutkan</value></data>
-  <data name="Mode_Desc_Bst" xml:space="preserve"><value>Fork sumber terbuka dari OpenSteamTools yang dikelola secara aktif oleh tim LuaTools. Menghadirkan perbaikan dan fitur baru!</value></data>
   <data name="Mode_CloudRedirect_Manage" xml:space="preserve"><value>Kelola</value></data>
   <data name="Mode_CloudRedirect_LaunchFailed" xml:space="preserve"><value>Tidak dapat mengunduh atau menjalankan CloudRedirect.</value></data>
   <data name="Mode_Desc_Ost" xml:space="preserve"><value>Build nightly OpenSteamTools dari sumber terbaru. Perbaikan terbaru, tetapi mungkin kurang stabil.</value></data>
@@ -157,8 +156,8 @@
   <data name="Mode_Name_Custom" xml:space="preserve"><value>Unlocker sendiri</value></data>
   <data name="Mode_Experimental" xml:space="preserve"><value>EKSPERIMENTAL</value></data>
   <data name="Mode_CloudRedirectSupport" xml:space="preserve"><value>DUKUNGAN CLOUDREDIRECT</value></data>
-  <data name="Mode_CloudRedirect_AddonDesc" xml:space="preserve"><value>Menghadirkan kembali dukungan Steam Cloud bawaan melalui penyedia penyimpanan pihak ketiga seperti Google Drive / OneDrive / Cloudflare R2 dan lainnya. Saat ini hanya kompatibel dengan OpenSteamTools / BetterSteamTools. Jangan lupa mengonfigurasinya dengan mengeklik "Kelola" setelah mengaktifkan, lalu mulai ulang Steam!</value></data>
-  <data name="Mode_CloudRedirect_Locked" xml:space="preserve"><value>Pilih OpenSteamTools / BetterSteamTools untuk menggunakan CloudRedirect.</value></data>
+  <data name="Mode_CloudRedirect_AddonDesc" xml:space="preserve"><value>Menghadirkan kembali dukungan Steam Cloud bawaan melalui penyedia penyimpanan pihak ketiga seperti Google Drive / OneDrive / Cloudflare R2 dan lainnya. Saat ini hanya kompatibel dengan OpenSteamTools. Jangan lupa mengonfigurasinya dengan mengeklik "Kelola" setelah mengaktifkan, lalu mulai ulang Steam!</value></data>
+  <data name="Mode_CloudRedirect_Locked" xml:space="preserve"><value>Pilih OpenSteamTools untuk menggunakan CloudRedirect.</value></data>
   <data name="Mode_CloudRedirect_Enable" xml:space="preserve"><value>Aktifkan</value></data>
   <data name="Mode_CloudRedirect_Disable" xml:space="preserve"><value>Nonaktifkan</value></data>
   <data name="Mode_CloudRedirect_Status_Enabled" xml:space="preserve"><value>Aktif.</value></data>
@@ -172,7 +171,7 @@
   <data name="Onboarding_SignIn_Blurb" xml:space="preserve"><value>Masuk untuk membuka fitur menambahkan game dan perbaikan.</value></data>
   <data name="Onboarding_SignedIn" xml:space="preserve"><value>Sudah masuk ✓</value></data>
   <data name="Onboarding_Recommended_Title" xml:space="preserve"><value>Terapkan pengaturan yang disarankan</value></data>
-  <data name="Onboarding_Recommended_Detail" xml:space="preserve"><value>Mode: BetterSteamTools · FastFetch aktif</value></data>
+  <data name="Onboarding_Recommended_Detail" xml:space="preserve"><value>Mode: OpenSteamTools · FastFetch aktif</value></data>
   <data name="Onboarding_Plugin_Title" xml:space="preserve"><value>Pasang plugin terkenal kami</value></data>
   <data name="Onboarding_Plugin_Detail" xml:space="preserve"><value>Menambahkan tombol "Add via LuaTools" ke halaman toko Steam.</value></data>
   <data name="Onboarding_Yes" xml:space="preserve"><value>Ya, silakan</value></data>

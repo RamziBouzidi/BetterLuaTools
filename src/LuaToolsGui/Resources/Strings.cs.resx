@@ -148,7 +148,6 @@
   <data name="Mode_Confirm_Body" xml:space="preserve"><value>Steam bude zavřen, aby bylo možné změnit jeho soubory, a poté se automaticky restartuje. Všechny spuštěné hry nebo stahování se zastaví.</value></data>
   <data name="Mode_Cancel" xml:space="preserve"><value>Zrušit</value></data>
   <data name="Mode_CloseSteamContinue" xml:space="preserve"><value>Zavřít Steam a pokračovat</value></data>
-  <data name="Mode_Desc_Bst" xml:space="preserve"><value>Open source fork OpenSteamTools, který aktivně udržuje tým LuaTools. Přináší opravy a nové funkce!</value></data>
   <data name="Mode_CloudRedirect_Manage" xml:space="preserve"><value>Spravovat</value></data>
   <data name="Mode_CloudRedirect_LaunchFailed" xml:space="preserve"><value>Nepodařilo se stáhnout ani spustit CloudRedirect.</value></data>
   <data name="Mode_Desc_Ost" xml:space="preserve"><value>Noční sestavení OpenSteamTools z nejnovějšího zdroje. Nejnovější opravy, ale může být méně stabilní.</value></data>
@@ -157,8 +156,8 @@
   <data name="Mode_Name_Custom" xml:space="preserve"><value>Vlastní odemykač</value></data>
   <data name="Mode_Experimental" xml:space="preserve"><value>EXPERIMENTÁLNÍ</value></data>
   <data name="Mode_CloudRedirectSupport" xml:space="preserve"><value>PODPORA CLOUDREDIRECT</value></data>
-  <data name="Mode_CloudRedirect_AddonDesc" xml:space="preserve"><value>Vrací nativní podporu Steam Cloud přes poskytovatele úložišť třetích stran, jako jsou Google Drive / OneDrive / Cloudflare R2 a další. Zatím kompatibilní pouze s OpenSteamTools / BetterSteamTools. Nezapomeňte jej po zapnutí nastavit kliknutím na "Spravovat" a poté restartujte Steam!</value></data>
-  <data name="Mode_CloudRedirect_Locked" xml:space="preserve"><value>Vyberte OpenSteamTools / BetterSteamTools, abyste mohli použít CloudRedirect.</value></data>
+  <data name="Mode_CloudRedirect_AddonDesc" xml:space="preserve"><value>Vrací nativní podporu Steam Cloud přes poskytovatele úložišť třetích stran, jako jsou Google Drive / OneDrive / Cloudflare R2 a další. Zatím kompatibilní pouze s OpenSteamTools. Nezapomeňte jej po zapnutí nastavit kliknutím na "Spravovat" a poté restartujte Steam!</value></data>
+  <data name="Mode_CloudRedirect_Locked" xml:space="preserve"><value>Vyberte OpenSteamTools, abyste mohli použít CloudRedirect.</value></data>
   <data name="Mode_CloudRedirect_Enable" xml:space="preserve"><value>Zapnout</value></data>
   <data name="Mode_CloudRedirect_Disable" xml:space="preserve"><value>Vypnout</value></data>
   <data name="Mode_CloudRedirect_Status_Enabled" xml:space="preserve"><value>Zapnuto.</value></data>
@@ -172,7 +171,7 @@
   <data name="Onboarding_SignIn_Blurb" xml:space="preserve"><value>Přihlaste se a odemkněte přidávání her a oprav.</value></data>
   <data name="Onboarding_SignedIn" xml:space="preserve"><value>Přihlášeno ✓</value></data>
   <data name="Onboarding_Recommended_Title" xml:space="preserve"><value>Použít doporučená nastavení</value></data>
-  <data name="Onboarding_Recommended_Detail" xml:space="preserve"><value>Režim: BetterSteamTools · FastFetch zapnutý</value></data>
+  <data name="Onboarding_Recommended_Detail" xml:space="preserve"><value>Režim: OpenSteamTools · FastFetch zapnutý</value></data>
   <data name="Onboarding_Plugin_Title" xml:space="preserve"><value>Nainstalovat náš slavný plugin</value></data>
   <data name="Onboarding_Plugin_Detail" xml:space="preserve"><value>Přidá tlačítko „Add via LuaTools“ na stránky obchodu Steam.</value></data>
   <data name="Onboarding_Yes" xml:space="preserve"><value>Ano, prosím</value></data>

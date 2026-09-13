@@ -148,7 +148,6 @@
   <data name="Mode_Confirm_Body" xml:space="preserve"><value>Steam se cerrará para poder modificar sus archivos y luego se reiniciará automáticamente. Cualquier juego o descarga en curso se detendrá.</value></data>
   <data name="Mode_Cancel" xml:space="preserve"><value>Cancelar</value></data>
   <data name="Mode_CloseSteamContinue" xml:space="preserve"><value>Cerrar Steam y continuar</value></data>
-  <data name="Mode_Desc_Bst" xml:space="preserve"><value>Un fork de código abierto de OpenSteamTools mantenido activamente por el equipo de LuaTools. ¡Con correcciones y funciones nuevas!</value></data>
   <data name="Mode_CloudRedirect_Manage" xml:space="preserve"><value>Gestionar</value></data>
   <data name="Mode_CloudRedirect_LaunchFailed" xml:space="preserve"><value>No se pudo descargar ni iniciar CloudRedirect.</value></data>
   <data name="Mode_Desc_Ost" xml:space="preserve"><value>Compilación nocturna de OpenSteamTools desde el código más reciente. Las correcciones más recientes, pero puede ser menos estable.</value></data>
@@ -157,8 +156,8 @@
   <data name="Mode_Name_Custom" xml:space="preserve"><value>Desbloqueador personalizado</value></data>
   <data name="Mode_Experimental" xml:space="preserve"><value>EXPERIMENTAL</value></data>
   <data name="Mode_CloudRedirectSupport" xml:space="preserve"><value>COMPATIBLE CON CLOUDREDIRECT</value></data>
-  <data name="Mode_CloudRedirect_AddonDesc" xml:space="preserve"><value>Recupera la compatibilidad nativa con Steam Cloud mediante proveedores de almacenamiento externos como Google Drive / OneDrive / Cloudflare R2 y más. Por ahora, solo es compatible con OpenSteamTools / BetterSteamTools. No olvides configurarlo haciendo clic en "Gestionar" después de activarlo y, luego, reinicia Steam.</value></data>
-  <data name="Mode_CloudRedirect_Locked" xml:space="preserve"><value>Selecciona OpenSteamTools / BetterSteamTools para usar CloudRedirect.</value></data>
+  <data name="Mode_CloudRedirect_AddonDesc" xml:space="preserve"><value>Recupera la compatibilidad nativa con Steam Cloud mediante proveedores de almacenamiento externos como Google Drive / OneDrive / Cloudflare R2 y más. Por ahora, solo es compatible con OpenSteamTools. No olvides configurarlo haciendo clic en "Gestionar" después de activarlo y, luego, reinicia Steam.</value></data>
+  <data name="Mode_CloudRedirect_Locked" xml:space="preserve"><value>Selecciona OpenSteamTools para usar CloudRedirect.</value></data>
   <data name="Mode_CloudRedirect_Enable" xml:space="preserve"><value>Activar</value></data>
   <data name="Mode_CloudRedirect_Disable" xml:space="preserve"><value>Desactivar</value></data>
   <data name="Mode_CloudRedirect_Status_Enabled" xml:space="preserve"><value>Activado.</value></data>
@@ -172,7 +171,7 @@
   <data name="Onboarding_SignIn_Blurb" xml:space="preserve"><value>Inicia sesión para desbloquear añadir juegos y arreglos.</value></data>
   <data name="Onboarding_SignedIn" xml:space="preserve"><value>Sesión iniciada ✓</value></data>
   <data name="Onboarding_Recommended_Title" xml:space="preserve"><value>Aplicar ajustes recomendados</value></data>
-  <data name="Onboarding_Recommended_Detail" xml:space="preserve"><value>Modo: BetterSteamTools · FastFetch activado</value></data>
+  <data name="Onboarding_Recommended_Detail" xml:space="preserve"><value>Modo: OpenSteamTools · FastFetch activado</value></data>
   <data name="Onboarding_Plugin_Title" xml:space="preserve"><value>Instalar nuestro famoso plugin</value></data>
   <data name="Onboarding_Plugin_Detail" xml:space="preserve"><value>Añade el botón «Add via LuaTools» a las páginas de la tienda de Steam.</value></data>
   <data name="Onboarding_Yes" xml:space="preserve"><value>Sí, por favor</value></data>

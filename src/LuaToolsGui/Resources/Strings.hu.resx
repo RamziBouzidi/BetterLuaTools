@@ -148,7 +148,6 @@
   <data name="Mode_Confirm_Body" xml:space="preserve"><value>A Steam bezárul, hogy a fájljai módosíthatók legyenek, majd automatikusan újraindul. Minden futó játék vagy letöltés leáll.</value></data>
   <data name="Mode_Cancel" xml:space="preserve"><value>Mégse</value></data>
   <data name="Mode_CloseSteamContinue" xml:space="preserve"><value>Steam bezárása és folytatás</value></data>
-  <data name="Mode_Desc_Bst" xml:space="preserve"><value>Az OpenSteamTools nyílt forráskódú forkja, amelyet a LuaTools csapata aktívan karbantart. Javításokkal és új funkciókkal!</value></data>
   <data name="Mode_CloudRedirect_Manage" xml:space="preserve"><value>Kezelés</value></data>
   <data name="Mode_CloudRedirect_LaunchFailed" xml:space="preserve"><value>A CloudRedirect letöltése vagy indítása nem sikerült.</value></data>
   <data name="Mode_Desc_Ost" xml:space="preserve"><value>A OpenSteamTools éjszakai buildje a legújabb forrásból. A legfrissebb javítások, de kevésbé lehet stabil.</value></data>
@@ -157,8 +156,8 @@
   <data name="Mode_Name_Custom" xml:space="preserve"><value>Saját feloldó</value></data>
   <data name="Mode_Experimental" xml:space="preserve"><value>KÍSÉRLETI</value></data>
   <data name="Mode_CloudRedirectSupport" xml:space="preserve"><value>CLOUDREDIRECT TÁMOGATÁS</value></data>
-  <data name="Mode_CloudRedirect_AddonDesc" xml:space="preserve"><value>Visszahozza a natív Steam Cloud támogatást külső tárhelyszolgáltatókon keresztül, mint a Google Drive / OneDrive / Cloudflare R2 és mások. Jelenleg csak a OpenSteamTools / BetterSteamTools móddal kompatibilis. Ne feledd bekapcsolás után a "Kezelés" gombra kattintva beállítani, majd indítsd újra a Steamet!</value></data>
-  <data name="Mode_CloudRedirect_Locked" xml:space="preserve"><value>Válaszd a OpenSteamTools / BetterSteamTools módot a CloudRedirect használatához.</value></data>
+  <data name="Mode_CloudRedirect_AddonDesc" xml:space="preserve"><value>Visszahozza a natív Steam Cloud támogatást külső tárhelyszolgáltatókon keresztül, mint a Google Drive / OneDrive / Cloudflare R2 és mások. Jelenleg csak a OpenSteamTools móddal kompatibilis. Ne feledd bekapcsolás után a "Kezelés" gombra kattintva beállítani, majd indítsd újra a Steamet!</value></data>
+  <data name="Mode_CloudRedirect_Locked" xml:space="preserve"><value>Válaszd a OpenSteamTools módot a CloudRedirect használatához.</value></data>
   <data name="Mode_CloudRedirect_Enable" xml:space="preserve"><value>Bekapcsolás</value></data>
   <data name="Mode_CloudRedirect_Disable" xml:space="preserve"><value>Kikapcsolás</value></data>
   <data name="Mode_CloudRedirect_Status_Enabled" xml:space="preserve"><value>Bekapcsolva.</value></data>
@@ -172,7 +171,7 @@
   <data name="Onboarding_SignIn_Blurb" xml:space="preserve"><value>Jelentkezz be a játékok és javítások hozzáadásának feloldásához.</value></data>
   <data name="Onboarding_SignedIn" xml:space="preserve"><value>Bejelentkezve ✓</value></data>
   <data name="Onboarding_Recommended_Title" xml:space="preserve"><value>Ajánlott beállítások alkalmazása</value></data>
-  <data name="Onboarding_Recommended_Detail" xml:space="preserve"><value>Mód: BetterSteamTools · FastFetch bekapcsolva</value></data>
+  <data name="Onboarding_Recommended_Detail" xml:space="preserve"><value>Mód: OpenSteamTools · FastFetch bekapcsolva</value></data>
   <data name="Onboarding_Plugin_Title" xml:space="preserve"><value>Híres bővítményünk telepítése</value></data>
   <data name="Onboarding_Plugin_Detail" xml:space="preserve"><value>Hozzáadja az „Add via LuaTools” gombot a Steam áruház oldalaihoz.</value></data>
   <data name="Onboarding_Yes" xml:space="preserve"><value>Igen, kérem</value></data>

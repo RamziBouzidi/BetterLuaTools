@@ -148,7 +148,6 @@
   <data name="Mode_Confirm_Body" xml:space="preserve"><value>將關閉 Steam 以便變更其檔案，隨後自動重新啟動。所有執行中的遊戲或下載都會停止。</value></data>
   <data name="Mode_Cancel" xml:space="preserve"><value>取消</value></data>
   <data name="Mode_CloseSteamContinue" xml:space="preserve"><value>關閉 Steam 並繼續</value></data>
-  <data name="Mode_Desc_Bst" xml:space="preserve"><value>OpenSteamTools 的開源分支，由 LuaTools 團隊積極維護。帶來各種修正和新功能！</value></data>
   <data name="Mode_CloudRedirect_Manage" xml:space="preserve"><value>管理</value></data>
   <data name="Mode_CloudRedirect_LaunchFailed" xml:space="preserve"><value>無法下載或啟動 CloudRedirect。</value></data>
   <data name="Mode_Desc_Ost" xml:space="preserve"><value>從最新原始碼建置的 OpenSteamTools 每夜版。包含最新修正，但可能較不穩定。</value></data>
@@ -157,8 +156,8 @@
   <data name="Mode_Name_Custom" xml:space="preserve"><value>自訂解鎖器</value></data>
   <data name="Mode_Experimental" xml:space="preserve"><value>實驗性</value></data>
   <data name="Mode_CloudRedirectSupport" xml:space="preserve"><value>支援 CloudRedirect</value></data>
-  <data name="Mode_CloudRedirect_AddonDesc" xml:space="preserve"><value>透過 Google Drive / OneDrive / Cloudflare R2 等第三方儲存服務，恢復原生 Steam 雲端存檔支援。目前僅相容於 OpenSteamTools / BetterSteamTools。啟用後別忘了點擊「管理」進行設定，然後重新啟動 Steam！</value></data>
-  <data name="Mode_CloudRedirect_Locked" xml:space="preserve"><value>選擇 OpenSteamTools / BetterSteamTools 以使用 CloudRedirect。</value></data>
+  <data name="Mode_CloudRedirect_AddonDesc" xml:space="preserve"><value>透過 Google Drive / OneDrive / Cloudflare R2 等第三方儲存服務，恢復原生 Steam 雲端存檔支援。目前僅相容於 OpenSteamTools。啟用後別忘了點擊「管理」進行設定，然後重新啟動 Steam！</value></data>
+  <data name="Mode_CloudRedirect_Locked" xml:space="preserve"><value>選擇 OpenSteamTools 以使用 CloudRedirect。</value></data>
   <data name="Mode_CloudRedirect_Enable" xml:space="preserve"><value>啟用</value></data>
   <data name="Mode_CloudRedirect_Disable" xml:space="preserve"><value>停用</value></data>
   <data name="Mode_CloudRedirect_Status_Enabled" xml:space="preserve"><value>已啟用。</value></data>
@@ -172,7 +171,7 @@
   <data name="Onboarding_SignIn_Blurb" xml:space="preserve"><value>登入以解鎖新增遊戲與修正。</value></data>
   <data name="Onboarding_SignedIn" xml:space="preserve"><value>已登入 ✓</value></data>
   <data name="Onboarding_Recommended_Title" xml:space="preserve"><value>套用建議設定</value></data>
-  <data name="Onboarding_Recommended_Detail" xml:space="preserve"><value>模式：BetterSteamTools · 開啟 FastFetch</value></data>
+  <data name="Onboarding_Recommended_Detail" xml:space="preserve"><value>模式：OpenSteamTools · 開啟 FastFetch</value></data>
   <data name="Onboarding_Plugin_Title" xml:space="preserve"><value>安裝我們著名的外掛</value></data>
   <data name="Onboarding_Plugin_Detail" xml:space="preserve"><value>在 Steam 商店頁面新增「Add via LuaTools」按鈕。</value></data>
   <data name="Onboarding_Yes" xml:space="preserve"><value>好的</value></data>
