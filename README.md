@@ -1,4 +1,4 @@
-<h3>Note: Remove bunch of plugins and tools that is not needded... also replaced bettersteamtools with OpenSteamTools cause opensteamtools works and no need for a modifiedd version of bettersteamtools...</h3>
+<h3>Note: Removed bunch of plugins and tools that is not needded... also replaced bettersteamtools with OpenSteamTools cause opensteamtools works and no need for a modifiedd version of bettersteamtools...</h3>
 
 
 
