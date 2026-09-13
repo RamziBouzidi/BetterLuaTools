@@ -202,7 +202,7 @@ public class CacheService
             && !_cache.OnboardingComplete
             && _cache.DownloadHistory.Count == 0
             && _cache.DepotDownloaderVersion is null
-            && _cache.DepotDownloaderCheckedAtMs == 0
+            && _cache.DepotDownloaderCheckedAtMs == 0;
         if (empty)
         {
             try { if (File.Exists(FilePath)) File.Delete(FilePath); } catch { /* best effort */ }
