@@ -1,32 +1,83 @@
-name: Build LuaTools
+name: Build
+run-name: ${{ github.event.inputs.version }} Build
 
 on:
-  push:
-    branches: [ "main", "master" ]
-  pull_request:
-    branches: [ "main", "master" ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (e.g. v1.0.0)"
+        required: true
+        default: ""
+
+permissions:
+  contents: write
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history so git log works for the changelog
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '8.0.x'
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
 
-    - name: Restore dependencies
-      run: dotnet restore LuaToolsGui.sln
+      - name: Restore dependencies
+        run: dotnet restore
 
-    - name: Build
-      run: dotnet build LuaToolsGui.sln --configuration Release --no-restore
+      - name: Publish Release
+        run: dotnet publish --configuration Release --output ./build/Release
 
-    - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: LuaTools-Release
-        path: src/LuaToolsGui/bin/Release/net8.0-windows/
+      - name: Publish Debug
+        run: dotnet publish --configuration Debug --output ./build/Debug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LuaTools-Release
+          path: build/Release/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LuaTools-Debug
+          path: build/Debug/
+
+      - name: Generate changelog
+        id: changelog
+        shell: bash
+        run: |
+          {
+            echo 'changelog<<EOF'
+            git log -1 --pretty=format:"- %s%n%b"
+            echo ''
+            echo 'EOF'
+          } >> $GITHUB_OUTPUT
+
+      - name: Create tag
+        run: |
+          git tag ${{ github.event.inputs.version }}
+          git push origin ${{ github.event.inputs.version }}
+
+      - name: Package Release
+        run: 7z a LuaTools-${{ github.event.inputs.version }}-Release.zip ".\build\Release\*" -mx5
+
+      - name: Package Debug
+        run: 7z a LuaTools-${{ github.event.inputs.version }}-Debug.zip ".\build\Debug\*" -mx5
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          body: |
+            ## Changes
+            ${{ steps.changelog.outputs.changelog }}
+
+            ## Installation
+            Download `LuaTools-${{ github.event.inputs.version }}-Release.zip` and extract the files to your desired directory.
+          files: |
+            LuaTools-${{ github.event.inputs.version }}-Release.zip
+            LuaTools-${{ github.event.inputs.version }}-Debug.zip
