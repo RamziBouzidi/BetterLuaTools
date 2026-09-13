@@ -14,13 +14,14 @@ namespace LuaToolsGui.ViewModels;
 public partial class DownloadsViewModel : ObservableObject
 {
     private readonly DownloadQueue _queue;
-
     private readonly ManifestJobFactory _jobs;
+    private readonly ToastService _toast;
 
-    public DownloadsViewModel(DownloadQueue queue, ManifestJobFactory jobs)
+    public DownloadsViewModel(DownloadQueue queue, ManifestJobFactory jobs, ToastService toast)
     {
         _queue = queue;
         _jobs = jobs;
+        _toast = toast;
 
         _queue.Items.CollectionChanged += (_, _) => RaiseCounts();
         _queue.History.CollectionChanged += (_, _) => RaiseCounts();

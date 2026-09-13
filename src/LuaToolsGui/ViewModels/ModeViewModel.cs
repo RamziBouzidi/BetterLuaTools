@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LuaToolsGui.Models;
@@ -199,22 +198,10 @@ public partial class ModeViewModel : ObservableObject
         }
     }
 
-    /// <summary>True if a hidden mode should be shown: its reveal-file exists, or it's the active mode.</summary>
-    private bool IsModeVisible(ModeDefinition def)
-    {
-        if (def.HiddenUnlessFile is null) return true;          // always-visible mode
-        if (_unlocker.SelectedMode == def.Mode) return true;    // active → keep visible even if file gone
-        string? root = _steam.EffectivePath;
-        return root is not null && File.Exists(Path.Combine(root, def.HiddenUnlessFile));
-    }
-
-    /// <summary>Rebuild the visible card list (hidden modes appear only when revealed). Preserves
-    /// existing cards so their bound state isn't reset; adds/removes as visibility changes.</summary>
+    /// <summary>Rebuild the card list while preserving existing cards and their bound state.</summary>
     private void SyncCards()
     {
-        var visible = _unlocker.Modes
-            .Where(IsModeVisible)
-            .ToList();
+        var visible = _unlocker.Modes;
 
         // Remove cards no longer visible.
         for (int i = Cards.Count - 1; i >= 0; i--)
