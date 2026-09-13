@@ -15,18 +15,7 @@ public partial class ModeCardViewModel(UnlockerMode mode, string title, string d
     public string Description { get; } = description;
 
     [ObservableProperty] private string _statusText = Resources.Strings.Mode_Checking;
-    [ObservableProperty] private string _buttonText = Resources.Strings.Mode_Btn_Install;
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ShowActionButton))]
-    private bool _isActive;
-
-    /// <summary>
-    /// Custom has nothing to install, update or reinstall, so once it's the active mode there is no
-    /// action left to offer and the button is hidden. The ACTIVE badge already says it's selected.
-    /// Every other card always has something to do (install, update, or switch to it).
-    /// </summary>
-    public bool ShowActionButton => !(Mode == UnlockerMode.Custom && IsActive);
+    [ObservableProperty] private bool _isActive;
 
     /// <summary>OST is the nightly channel, so it carries the amber warning.</summary>
     public bool IsExperimental => Mode == UnlockerMode.Ost;
@@ -44,7 +33,6 @@ public partial class ModeViewModel : ObservableObject
 {
     private readonly UnlockerService _unlocker;
     private readonly ToastService _toast;
-    private readonly SteamService _steam;
     private readonly CloudRedirectService _cloudRedirect;
 
     public ObservableCollection<ModeCardViewModel> Cards { get; } = [];
@@ -58,17 +46,11 @@ public partial class ModeViewModel : ObservableObject
     [ObservableProperty] private double _progress;
     [ObservableProperty] private bool _isProgressIndeterminate;
 
-    // ── Steam-shutdown confirmation overlay ──────────────────────────
-    [ObservableProperty] private bool _isConfirming;
-    [ObservableProperty] private string _confirmTitle = "";
-    private ModeCardViewModel? _pendingCard;
-
-    public ModeViewModel(UnlockerService unlocker, ToastService toast, SteamService steam,
+    public ModeViewModel(UnlockerService unlocker, ToastService toast,
         CloudRedirectService cloudRedirect)
     {
         _unlocker = unlocker;
         _toast = toast;
-        _steam = steam;
         _cloudRedirect = cloudRedirect;
     }
 
@@ -250,9 +232,7 @@ public partial class ModeViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Page open / refresh. Only the ACTIVE mode is checked against GitHub (inactive cards just show
-    /// "Switch to this": switching re-fetches anyway, so pinging for them is wasted, and their hash
-    /// check would be misleading since modes share filenames). Active check is cached briefly.
+    /// Page open / refresh. OpenSteamTool status is checked from the local Steam folder only.
     /// </summary>
     private bool _detectionAttempted;
 
@@ -279,7 +259,7 @@ public partial class ModeViewModel : ObservableObject
             }
             else
             {
-                // No network for inactive modes.
+                // No status check is needed for inactive modes.
                 Apply(card, new ModeState(card.Mode, ModeStatus.NotInstalled, IsActive: false, null));
             }
         }
@@ -321,93 +301,7 @@ public partial class ModeViewModel : ObservableObject
                 _ => Resources.Strings.Mode_StatusUnavailable,
             };
 
-        card.ButtonText = (s.IsActive, s.Status) switch
-        {
-            // Never rendered: ShowActionButton hides the button in this exact case. Mapped anyway so
-            // a regression in that binding surfaces a harmless "Switch to this" rather than falling
-            // through to "Install" on a mode that installs nothing.
-            (true, ModeStatus.UserManaged) => Resources.Strings.Mode_Btn_Switch,
-            (true, ModeStatus.UpToDate) => Resources.Strings.Mode_Btn_Reinstall,
-            (true, ModeStatus.UpdateAvailable) => Resources.Strings.Mode_Btn_Update,
-            (true, _) => Resources.Strings.Mode_Btn_Install,
-            (false, _) => Resources.Strings.Mode_Btn_Switch,
-        };
         card.IsActive = s.IsActive;
     }
 
-    // ── Install with confirmation ────────────────────────────────────
-
-    /// <summary>Card button → ask the user to confirm (Steam will be closed) before doing anything.</summary>
-    [RelayCommand]
-    private void Install(ModeCardViewModel card)
-    {
-        if (IsBusy) return;
-        _pendingCard = card;
-        ConfirmTitle = card.IsActive
-            ? string.Format(Resources.Strings.Mode_Confirm_Reinstall, card.Title)
-            : string.Format(Resources.Strings.Mode_Confirm_Switch, card.Title);
-        IsConfirming = true;
-    }
-
-    [RelayCommand]
-    private void CancelConfirm()
-    {
-        IsConfirming = false;
-        _pendingCard = null;
-    }
-
-    [RelayCommand]
-    private async Task ConfirmInstall()
-    {
-        IsConfirming = false;
-        var card = _pendingCard;
-        _pendingCard = null;
-        if (card is null) return;
-
-        await RunInstall(card.Mode);
-    }
-
-    private async Task RunInstall(UnlockerMode mode)
-    {
-        if (IsBusy) return;
-        IsBusy = true;
-        IsProgressIndeterminate = true;
-        Progress = 0;
-        try
-        {
-            var prog = new Progress<double?>(p =>
-            {
-                IsProgressIndeterminate = p is null;
-                if (p is not null) Progress = p.Value * 100;
-            });
-
-            // Correct order: kill Steam → write the files → relaunch Steam.
-            // (Files can't be overwritten while Steam holds them open. CloudRedirect's CLI also closes
-            //  Steam itself, but stopping first is harmless and keeps all modes consistent.)
-            await Task.Run(_steam.StopSteam);
-
-            var result = await _unlocker.InstallAsync(mode, prog);
-
-            if (result.Success)
-            {
-                bool started = await Task.Run(_steam.StartSteam);
-                _toast.Show(Resources.Strings.Mode_Toast_Updated, started
-                    ? string.Format(Resources.Strings.Mode_Toast_Updated_Restarting, mode)
-                    : string.Format(Resources.Strings.Mode_Toast_Updated_Start, mode));
-            }
-            else
-            {
-                // Install failed: bring Steam back up anyway so the user isn't left without it.
-                await Task.Run(_steam.StartSteam);
-                _toast.Show(Resources.Strings.Mode_Toast_InstallFailed, result.Error ?? Resources.Strings.Mode_Toast_InstallFailed_Body, error: true);
-            }
-
-            await LoadAsync();
-        }
-        finally
-        {
-            IsBusy = false;
-            IsProgressIndeterminate = false;
-        }
-    }
 }

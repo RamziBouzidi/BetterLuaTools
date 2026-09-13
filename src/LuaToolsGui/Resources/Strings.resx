@@ -166,7 +166,7 @@
   <!-- Mode descriptions + C# strings -->
   <data name="Mode_CloudRedirect_Manage" xml:space="preserve"><value>Manage</value></data>
   <data name="Mode_CloudRedirect_LaunchFailed" xml:space="preserve"><value>Couldn't download or launch CloudRedirect.</value></data>
-  <data name="Mode_Desc_Ost" xml:space="preserve"><value>Nightly build of OpenSteamTools from the latest source. Newest fixes, but may be less stable.</value></data>
+  <data name="Mode_Desc_Ost" xml:space="preserve"><value>Use the OpenSteamTools files supplied manually in your Steam folder. LuaTools will not download or update them.</value></data>
   <data name="Mode_Name_Custom" xml:space="preserve"><value>Custom Unlocker</value></data>
   <data name="Mode_Desc_Custom" xml:space="preserve"><value>Use your own unlocking solution, we will not mess with it</value></data>
   <data name="Mode_UserManaged" xml:space="preserve"><value>You're on your own</value></data>

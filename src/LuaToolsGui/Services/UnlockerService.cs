@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using LuaToolsGui.Models;
@@ -8,41 +6,21 @@ using LuaToolsGui.Models;
 namespace LuaToolsGui.Services;
 
 /// <summary>
-/// Manages the mutually-exclusive Steam unlockers (OpenSteamTools / Custom). Only
-/// one is active at a time. Each managed mode resolves its own build, verifies files by sha256, and
-/// installs into the Steam root; Custom downloads and verifies nothing, since the user owns those
-/// files. Switching overwrites shared files but doesn't delete the previous mode's leftovers. The
-/// active mode persists in settings.
+/// Manages the mutually-exclusive Steam unlocker selection. OpenSteamTools is supplied manually;
+/// this service only detects its local files and registers LuaTools' Lua path.
 /// </summary>
-public class UnlockerService(SteamService steam, SettingsService settings, CacheService cache, GithubProxy gh)
+public class UnlockerService(SteamService steam, SettingsService settings, GithubProxy gh)
 {
     private static readonly JsonSerializerOptions JsonOpts = new() { PropertyNameCaseInsensitive = true };
 
-    // Per-mode cache of the GitHub release so re-opening the page doesn't hammer the API
-    // (unauthenticated GitHub allows only 60 req/hr per IP). The "Check for updates" button forces a
-    // fresh fetch (30s cooldown) for anyone who wants certainty sooner.
     private static readonly TimeSpan CacheTtl = TimeSpan.FromMinutes(5);
-    private readonly Dictionary<UnlockerMode, (GithubRelease release, DateTime fetchedAt)> _releaseCache = new();
     public IReadOnlyList<ModeDefinition> Modes { get; } =
     [
-        // The nightly channel of upstream OpenSteamTool, built from main into our own OST-Nightly repo.
-        // Carries native CloudRedirect support (see the add-on below).
         new(UnlockerMode.Ost, "OpenSteamTools",
-            Description: Resources.Strings.Mode_Desc_Ost,
-            Kind: ModeKind.Zip,
-            Owner: "madoiscool", Repo: "OST-Nightly",
-            FixedTag: null,
-            PlaceFiles: ["dwmapi.dll", "xinput1_4.dll", "OpenSteamTool.dll"],
-            ZipAssetPattern: "OpenSteamTool-{version}-Release.zip"),
+            Description: Resources.Strings.Mode_Desc_Ost),
 
-        // Opt-out: the user installs and updates their own unlocker, and we place/verify nothing.
         new(UnlockerMode.Custom, Resources.Strings.Mode_Name_Custom,
-            Description: Resources.Strings.Mode_Desc_Custom,
-            Kind: ModeKind.Manual,
-            Owner: "", Repo: "",
-            FixedTag: null,
-            PlaceFiles: [],
-            ZipAssetPattern: null),
+            Description: Resources.Strings.Mode_Desc_Custom),
     ];
 
     private ModeDefinition Def(UnlockerMode mode) => Modes.First(m => m.Mode == mode);
@@ -60,10 +38,8 @@ public class UnlockerService(SteamService steam, SettingsService settings, Cache
     /// hot-reload instead of needing a Steam restart.
     /// </summary>
     /// <remarks>
-    /// The app no longer tells users to restart Steam after a lua change, because OST re-reads any
-    /// directory listed in <c>opensteamtool.toml</c>'s <c>[lua] paths</c>. That makes this registration
-    /// load-bearing rather than a nicety: previously it ran only inside <see cref="InstallAsync"/>, so a
-    /// user who set their unlocker up outside this app got neither hot-reload nor restart advice.
+    /// OST re-reads any directory listed in <c>opensteamtool.toml</c>'s <c>[lua] paths</c>, so this
+    /// registration keeps manually installed OpenSteamTool setups compatible with LuaTools.
     ///
     /// Safe to call repeatedly — the underlying edit is targeted, comment-preserving and append-only, and
     /// no-ops when the path is already present. Skipped for <c>Custom</c>, whose unlocker we know nothing
@@ -78,277 +54,37 @@ public class UnlockerService(SteamService steam, SettingsService settings, Cache
 
     // ── State query ─────────────────────────────────────────────────
 
-    /// <summary>Query GitHub + local files → this mode's status. Returns Unknown on any failure/offline.
-    /// Cached briefly unless <paramref name="forceRefresh"/>.</summary>
+    /// <summary>Query the locally supplied unlocker files. No network request is made for OST.</summary>
     public async Task<ModeState> GetStateAsync(UnlockerMode mode, bool forceRefresh = false, CancellationToken ct = default)
     {
-        var def = Def(mode);
         bool active = SelectedMode == mode;
 
-        // Custom: the user owns their files. Nothing to fetch, nothing to compare.
-        if (def.Kind == ModeKind.Manual)
+        if (mode == UnlockerMode.Custom)
             return new ModeState(mode, ModeStatus.UserManaged, active, null);
 
         string? root = steam.EffectivePath;
         if (root is null || !steam.IsValid)
             return new ModeState(mode, ModeStatus.Unknown, active, null);
 
-        // Recognise both the nightly release and the stable OST mirror.
-        var (ostStatus, latestTag) = await OstStatusAsync(def, root, forceRefresh, ct);
-        return new ModeState(mode, ostStatus, active, latestTag);
-    }
-
-    /// <summary>
-    /// OST status across both channels. Nightly builds differ per build in OpenSteamTool.dll, so that's
-    /// the nightly indicator; stable OST is detected via the mendy-tools "ost-" mirror's per-DLL hashes
-    /// (upstream only publishes a zip digest, not per-file ones).
-    /// </summary>
-    private async Task<(ModeStatus status, string? latestTag)> OstStatusAsync(
-        ModeDefinition def, string root, bool forceRefresh, CancellationToken ct)
-    {
-        var nightly = await FetchReleaseAsync(def, forceRefresh, ct);
-        string ostDll = Path.Combine(root, "OpenSteamTool.dll");
-
-        if (nightly is not null && File.Exists(ostDll)
-            && AssetDigest(nightly, "OpenSteamTool.dll") == AssetHash.OfFile(ostDll))
-            return (ModeStatus.UpToDate, nightly.TagName);
-
-        // Not the current nightly. Fall back to the stable mirror to tell "on stable OST" apart from
-        // "nothing installed": both end up as UpdateAvailable, but only the former is really OST.
-        var (mirrorStatus, mirrorTag) = await OstMirrorStatusAsync(root, ct);
-        string? tag = nightly?.TagName ?? mirrorTag;
-
-        if (mirrorStatus == ModeStatus.NotInstalled && !File.Exists(ostDll))
-            return (ModeStatus.NotInstalled, tag);
-        if (nightly is null && mirrorStatus == ModeStatus.Unknown)
-            return (ModeStatus.Unknown, tag);
-        return (ModeStatus.UpdateAvailable, tag);
-    }
-
-    private const string MirrorRepoOwner = "mendy-tools";
-    private const string MirrorRepo = "verynotsusdllsthataredefnotstrelated";
-
-    /// <summary>
-    /// OpenSteamTools status via the mendy-tools "ost-" mirror (real per-DLL hashes). Hash the on-disk
-    /// dwmapi.dll against the mirror: matches the LATEST ost- release (by published_at) → UpToDate;
-    /// matches an older ost- release (or files present but no match) → UpdateAvailable; absent → NotInstalled.
-    /// Returns the latest ost- tag for display.
-    /// </summary>
-    private async Task<(ModeStatus status, string? latestTag)> OstMirrorStatusAsync(string root, CancellationToken ct)
-    {
-        string dwmapi = Path.Combine(root, "dwmapi.dll");
-        if (!File.Exists(dwmapi)) return (ModeStatus.NotInstalled, null);
-
-        var releases = await FetchAllReleasesAsync(MirrorRepoOwner, MirrorRepo, null, ct);
-        if (releases is null) return (ModeStatus.Unknown, null);
-
-        var ost = releases.Where(r => r.TagName.StartsWith("ost-", StringComparison.OrdinalIgnoreCase))
-            .OrderByDescending(r => r.PublishedAt ?? DateTimeOffset.MinValue).ToList();
-        if (ost.Count == 0) return (ModeStatus.Unknown, null);
-
-        var latest = ost[0];
-        string dwmHash = AssetHash.OfFile(dwmapi);
-
-        if (AssetDigest(latest, "dwmapi.dll") == dwmHash) return (ModeStatus.UpToDate, latest.TagName);
-        // Matches an older ost- release, or is present but unrecognized → an update exists.
-        return (ModeStatus.UpdateAvailable, latest.TagName);
-    }
-
-    // ── Install / switch ─────────────────────────────────────────────
-
-    /// <summary>Download + verify a mode's files, place them in the Steam root, remove the other mode's
-    /// unique files, and persist the selection. Best-effort per file (locked files land in Failed).</summary>
-    public async Task<ModeInstallResult> InstallAsync(
-        UnlockerMode mode, IProgress<double?>? progress = null, CancellationToken ct = default)
-    {
-        var def = Def(mode);
-
-        // Custom: selecting it is the whole operation. Nothing is downloaded, nothing is written to
-        // the Steam root, and whatever the user has installed is left exactly as it is.
-        if (def.Kind == ModeKind.Manual)
-        {
-            settings.SelectedMode = mode.ToString();
-            return ModeInstallResult.Ok();
-        }
-
-        string? root = steam.EffectivePath;
-        if (root is null || !steam.IsValid)
-            return ModeInstallResult.Fail(Resources.Strings.Err_SteamNotFound);
-
-        // Resolve the release using the same cached data the status card was based on.
-        var release = await FetchReleaseAsync(def, forceRefresh: false, ct);
-        if (release is null)
-            return ModeInstallResult.Fail(Resources.Strings.Err_GithubUnreachable);
-        string version = release.TagName;
-
-        string staging = Path.Combine(Path.GetTempPath(), "LuaToolsGui", "mode", Guid.NewGuid().ToString("N"));
-        try
-        {
-            Directory.CreateDirectory(staging);
-
-            // 1. Stage + verify into temp.
-            Dictionary<string, string> staged; // filename → staged path
-            string? zipDigest = null;
-            {
-                var asset = FindZipAsset(def, release);
-                if (asset is null) return ModeInstallResult.Fail(Resources.Strings.Err_ReleaseMissingDownload);
-                string zipName = asset.Name;
-                string zipUrl = asset.DownloadUrl;
-                string? wantedZipDigest = AssetHash.ParseDigest(asset.Digest);
-
-                string zipPath = Path.Combine(staging, zipName);
-                await DownloadToFileAsync(zipUrl, zipPath, progress, ct);
-
-                zipDigest = AssetHash.OfFile(zipPath);
-                if (wantedZipDigest is { } want && !zipDigest.Equals(want, StringComparison.OrdinalIgnoreCase))
-                    return ModeInstallResult.Fail(Resources.Strings.Err_VerifyFailed);
-
-                staged = ExtractWanted(zipPath, def.PlaceFiles, staging);
-                var missing = def.PlaceFiles.Where(f => !staged.ContainsKey(f)).ToList();
-                if (missing.Count > 0)
-                    return ModeInstallResult.Fail(string.Format(Resources.Strings.Err_DownloadMissingFiles, string.Join(", ", missing)));
-
-            }
-
-            // 2. Copy verified files into the Steam root (overwrite). Locked files → Failed (Steam running).
-            var failed = new List<string>();
-            foreach (string file in def.PlaceFiles)
-            {
-                try
-                {
-                    string dest = Path.Combine(root, file);
-                    File.Copy(staged[file], dest, overwrite: true);
-                    StampNow(dest);
-                }
-                catch
-                {
-                    failed.Add(file);
-                }
-            }
-
-            // 3. This mode is now the active one. (No cleanup of other modes' files. Just overwrite.)
-            settings.SelectedMode = mode.ToString();
-
-            // Record the installed zip digest/version for reference (the up-to-date check uses per-DLL
-            // hashes, not this). Both remaining install modes are OpenSteamTool-derived, so both want
-            // their config pointed at stplug-in.
-            cache.OpenSteamToolsInstalledZipDigest = zipDigest;
-            cache.OpenSteamToolsInstalledVersion = version;
-            try { EnsureOpenSteamToolLuaPath(root); } catch { /* config tweak is best-effort */ }
-
-            return failed.Count > 0
-                ? new ModeInstallResult(false, string.Format(Resources.Strings.Err_WriteFailedCount, failed.Count), failed)
-                : ModeInstallResult.Ok();
-        }
-        catch (OperationCanceledException)
-        {
-            return ModeInstallResult.Fail(Resources.Strings.Err_Cancelled);
-        }
-        catch (Exception ex)
-        {
-            return ModeInstallResult.Fail(ex.Message);
-        }
-        finally
-        {
-            try { Directory.Delete(staging, recursive: true); } catch { /* best effort */ }
-        }
+        string[] required = ["OpenSteamTool.dll", "dwmapi.dll", "xinput1_4.dll"];
+        bool installed = required.All(file => File.Exists(Path.Combine(root, file)));
+        return new ModeState(mode, installed ? ModeStatus.UpToDate : ModeStatus.NotInstalled, active, null);
     }
 
     // ── First-run auto-detect ────────────────────────────────────────
 
-    /// <summary>
-    /// One-time detection of an already-installed mode when none is selected yet. Hashes the on-disk
-    /// DLLs against published digests, in priority order:
-    ///   1. Ost (nightly): OpenSteamTool.dll vs any madoiscool/OST-Nightly release asset.
-    ///   2. Ost (stable): dwmapi.dll AND xinput1_4.dll vs mendy-tools tag "ost-" (loose-DLL mirror;
-    ///      OST ships a zip whose API digest isn't per-DLL, so we mirror the DLLs for hash-matching).
-    ///      Still OST, just the other channel: GetStateAsync will offer the move to nightly.
-    ///
-    /// EVERY branch requires an EXACT hash match. Do not relax this to "the file exists": SteamTools
-    /// shipped the same dwmapi.dll / xinput1_4.dll filenames, so a presence check would silently claim
-    /// ex-SteamTools users as OST. Exactly the users ModeMigration deliberately routes to onboarding.
-    /// Never auto-selects <see cref="UnlockerMode.Custom"/>; that's an explicit user choice.
-    ///
-    /// Persists the match as the active mode. Returns the detected mode, or null if nothing matched.
-    /// </summary>
+    /// <summary>Detect the manually supplied OpenSteamTool files using local presence only.</summary>
     public async Task<UnlockerMode?> DetectActiveModeAsync(CancellationToken ct = default)
     {
         string? root = steam.EffectivePath;
         if (root is null || !steam.IsValid) return null;
 
-        UnlockerMode? detected = null;
+        string[] required = ["OpenSteamTool.dll", "dwmapi.dll", "xinput1_4.dll"];
+        if (!required.All(file => File.Exists(Path.Combine(root, file)))) return null;
 
-        // The loader DLLs (dwmapi/xinput) are often byte-identical across builds, so the payload
-        // OpenSteamTool.dll identifies the OST nightly build.
-        string ostDll = Path.Combine(root, "OpenSteamTool.dll");
-        if (File.Exists(ostDll))
-        {
-            string ostHash = AssetHash.OfFile(ostDll);
-
-            var nightly = await FetchAllReleasesAsync("madoiscool", "OST-Nightly", null, ct);
-            if (nightly is not null && nightly.Any(r => AssetDigest(r, "OpenSteamTool.dll") == ostHash))
-                detected = UnlockerMode.Ost;
-        }
-
-        // Stable OST via the loose-DLL mirror. Both DLLs must be present and each must hash-match SOME
-        // ost- release. The two ship in SEPARATE releases, so they're matched independently.
-        if (detected is null)
-        {
-            string dwmapi = Path.Combine(root, "dwmapi.dll");
-            string xinput = Path.Combine(root, "xinput1_4.dll");
-            if (File.Exists(dwmapi) && File.Exists(xinput))
-            {
-                var mirror = await FetchAllReleasesAsync(MirrorRepoOwner, MirrorRepo, null, ct);
-                var tagged = mirror?
-                    .Where(r => r.TagName.StartsWith("ost-", StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-                if (tagged is { Count: > 0 })
-                {
-                    string dwmHash = AssetHash.OfFile(dwmapi);
-                    string xinHash = AssetHash.OfFile(xinput);
-                    if (tagged.Any(r => AssetDigest(r, "dwmapi.dll") == dwmHash)
-                        && tagged.Any(r => AssetDigest(r, "xinput1_4.dll") == xinHash))
-                        detected = UnlockerMode.Ost;
-                }
-            }
-        }
-
-        if (detected is { } m) settings.SelectedMode = m.ToString();
-        return detected;
-    }
-
-    /// <summary>Digest (hex, no prefix) of a release's same-named asset, or null if absent.</summary>
-    private static string? AssetDigest(GithubRelease r, string assetName) =>
-        AssetHash.ParseDigest(r.Assets.FirstOrDefault(a => a.Name.Equals(assetName, StringComparison.OrdinalIgnoreCase))?.Digest);
-
-    /// <summary>The same-named asset, or null if this release doesn't have it.</summary>
-    private static GithubAsset? FindAsset(GithubRelease r, string assetName) =>
-        r.Assets.FirstOrDefault(a => a.Name.Equals(assetName, StringComparison.OrdinalIgnoreCase));
-
-    /// <summary>Fetch every release for a repo (per_page=100). If <paramref name="tag"/> is set, only
-    /// that one release (wrapped in a list). Null on failure/offline.</summary>
-    private async Task<List<GithubRelease>?> FetchAllReleasesAsync(string owner, string repo, string? tag, CancellationToken ct)
-    {
-        string url = tag is not null
-            ? $"https://api.github.com/repos/{owner}/{repo}/releases/tags/{tag}"
-            : $"https://api.github.com/repos/{owner}/{repo}/releases?per_page=100";
-        try
-        {
-            // Routed via GithubProxy: direct, then mirrors (for blocked/throttled regions).
-            using var res = await gh.SendAsync(url, ct);
-            if (res is null || !res.IsSuccessStatusCode) return null;
-            string body = await res.Content.ReadAsStringAsync(ct);
-            if (tag is not null)
-            {
-                var one = JsonSerializer.Deserialize<GithubRelease>(body, JsonOpts);
-                return one is null ? null : [one];
-            }
-            return JsonSerializer.Deserialize<List<GithubRelease>>(body, JsonOpts);
-        }
-        catch
-        {
-            return null;
-        }
+        settings.SelectedMode = UnlockerMode.Ost.ToString();
+        await Task.CompletedTask;
+        return UnlockerMode.Ost;
     }
 
     // ── OpenSteamTool config ─────────────────────────────────────────
@@ -644,61 +380,13 @@ public class UnlockerService(SteamService steam, SettingsService settings, Cache
 
     // ── Helpers ──────────────────────────────────────────────────────
 
-    private async Task<GithubRelease?> FetchReleaseAsync(ModeDefinition def, bool forceRefresh, CancellationToken ct)
-    {
-        // Serve from cache within the TTL unless a forced refresh is requested.
-        if (!forceRefresh
-            && _releaseCache.TryGetValue(def.Mode, out var cached)
-            && DateTime.UtcNow - cached.fetchedAt < CacheTtl)
-            return cached.release;
+    private static string? AssetDigest(GithubRelease release, string assetName) =>
+        AssetHash.ParseDigest(release.Assets.FirstOrDefault(
+            asset => asset.Name.Equals(assetName, StringComparison.OrdinalIgnoreCase))?.Digest);
 
-        string url = def.FixedTag is not null
-            ? $"https://api.github.com/repos/{def.Owner}/{def.Repo}/releases/tags/{def.FixedTag}"
-            : $"https://api.github.com/repos/{def.Owner}/{def.Repo}/releases/latest";
-        try
-        {
-            // Routed via GithubProxy: direct, then mirrors (for blocked/throttled regions).
-            using var res = await gh.SendAsync(url, ct);
-            if (res is null || !res.IsSuccessStatusCode) return null;
-            var release = JsonSerializer.Deserialize<GithubRelease>(await res.Content.ReadAsStringAsync(ct), JsonOpts);
-            if (release is not null) _releaseCache[def.Mode] = (release, DateTime.UtcNow);
-            return release;
-        }
-        catch
-        {
-            return null; // offline / rate-limited / parse error → caller maps to Unknown
-        }
-    }
-
-    /// <summary>Find the small Release zip (matches the pattern, excludes any Debug build).</summary>
-    private static GithubAsset? FindZipAsset(ModeDefinition def, GithubRelease release)
-    {
-        string wanted = (def.ZipAssetPattern ?? "").Replace("{version}", release.TagName);
-        return release.Assets.FirstOrDefault(a =>
-                   a.Name.Equals(wanted, StringComparison.OrdinalIgnoreCase) &&
-                   !a.Name.Contains("Debug", StringComparison.OrdinalIgnoreCase))
-               ?? release.Assets.FirstOrDefault(a =>
-                   a.Name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase) &&
-                   a.Name.Contains("Release", StringComparison.OrdinalIgnoreCase) &&
-                   !a.Name.Contains("Debug", StringComparison.OrdinalIgnoreCase));
-    }
-
-    /// <summary>Extract just the wanted files from a zip into <paramref name="destDir"/> (flattened).</summary>
-    private static Dictionary<string, string> ExtractWanted(string zipPath, string[] wanted, string destDir)
-    {
-        var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        using var archive = ZipFile.OpenRead(zipPath);
-        foreach (var entry in archive.Entries)
-        {
-            if (string.IsNullOrEmpty(entry.Name)) continue; // directory entry
-            string? match = wanted.FirstOrDefault(w => w.Equals(entry.Name, StringComparison.OrdinalIgnoreCase));
-            if (match is null || result.ContainsKey(match)) continue;
-            string dest = Path.Combine(destDir, match);
-            entry.ExtractToFile(dest, overwrite: true);
-            result[match] = dest;
-        }
-        return result;
-    }
+    private static GithubAsset? FindAsset(GithubRelease release, string assetName) =>
+        release.Assets.FirstOrDefault(asset =>
+            asset.Name.Equals(assetName, StringComparison.OrdinalIgnoreCase));
 
     // Asset download routed via GithubProxy: direct, then mirrors (for blocked/throttled regions).
     private Task DownloadToFileAsync(string url, string destPath, IProgress<double?>? progress, CancellationToken ct) =>

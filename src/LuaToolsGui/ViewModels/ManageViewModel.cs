@@ -183,7 +183,6 @@ public partial class ManageViewModel : PagedListViewModel<LuaTileViewModel>
     private readonly CoverCache _covers;
     private readonly ToastService _toast;
     private readonly SettingsService _settings;
-    private readonly SteamlessService _steamless;
 
     private List<LuaTileViewModel> _all = [];
     private CancellationTokenSource? _prefetchCts;
@@ -274,8 +273,7 @@ public partial class ManageViewModel : PagedListViewModel<LuaTileViewModel>
     public string SelectionLabel => string.Format(Resources.Strings.Manage_SelectionLabel, SelectedCount);
 
     public ManageViewModel(SteamService steam, SteamAppListCache appList, SteamAppInfoCache appInfo,
-        CoverCache covers, ToastService toast, SettingsService settings,
-        SteamlessService steamless)
+        CoverCache covers, ToastService toast, SettingsService settings)
     {
         _steam = steam;
         _appList = appList;
@@ -283,7 +281,6 @@ public partial class ManageViewModel : PagedListViewModel<LuaTileViewModel>
         _covers = covers;
         _toast = toast;
         _settings = settings;
-        _steamless = steamless;
         InitPageSize(settings.ManagePageSize);
     }
 
@@ -374,67 +371,6 @@ public partial class ManageViewModel : PagedListViewModel<LuaTileViewModel>
 
     [RelayCommand]
     private void Update(LuaTileViewModel tile) => NavigateToAdd?.Invoke(tile.AppId);
-
-    // ── Steamless: remove SteamStub DRM ──────────────────────────────
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(NotBusy))]
-    private bool _isBusy;
-    public bool NotBusy => !IsBusy;
-
-    [ObservableProperty] private double _progress;
-    [ObservableProperty] private bool _isProgressIndeterminate;
-
-    /// <summary>Download Steamless (once) and strip SteamStub DRM from this game's executable(s).</summary>
-    [RelayCommand]
-    private async Task RemoveDrm(LuaTileViewModel? tile)
-    {
-        if (tile is null || IsBusy) return;
-
-        var confirm = MessageBox.Show(
-            Resources.Strings.Manage_Steamless_Confirm_Body,
-            Resources.Strings.Manage_Steamless_Confirm_Title,
-            MessageBoxButton.OKCancel, MessageBoxImage.Warning);
-        if (confirm != MessageBoxResult.OK) return;
-
-        IsBusy = true;
-        IsProgressIndeterminate = true;
-        Progress = 0;
-        var prog = new Progress<double?>(p =>
-        {
-            IsProgressIndeterminate = p is null;
-            if (p is not null) Progress = p.Value * 100;
-        });
-
-        try
-        {
-            var result = await _steamless.PatchGameAsync(tile.AppId, prog);
-            if (result.Failed)
-            {
-                string msg = result.Error switch
-                {
-                    "no-install" => Resources.Strings.Manage_Steamless_NoInstall,
-                    "no-exe" => Resources.Strings.Manage_Steamless_NoInstall,
-                    _ => string.Format(Resources.Strings.Manage_Steamless_Failed, ""),
-                };
-                _toast.Show(Resources.Strings.Manage_Action_RemoveDrm, msg, error: true);
-            }
-            else
-            {
-                _toast.Show(Resources.Strings.Manage_Action_RemoveDrm,
-                    string.Format(Resources.Strings.Manage_Toast_Steamless_Done, result.Patched, result.Unchanged));
-            }
-        }
-        catch (Exception ex)
-        {
-            _toast.Show(Resources.Strings.Manage_Action_RemoveDrm,
-                string.Format(Resources.Strings.Manage_Steamless_Failed, ex.Message), error: true);
-        }
-        finally
-        {
-            IsBusy = false;
-            IsProgressIndeterminate = false;
-        }
-    }
 
     /// <summary>Confirm, then delete the &lt;appid&gt;.lua file and remove the tile from the grid.</summary>
     [RelayCommand]

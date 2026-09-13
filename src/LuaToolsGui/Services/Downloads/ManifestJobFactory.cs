@@ -24,7 +24,6 @@ public class ManifestJobFactory(
     ToastService toast,
     DepotDownloaderService depotTool,
     SteamDepotInfo depotInfo,
-    SteamAutoCrackService sac,
     AppliedFixIndexService fixIndex)
 {
     // ── Job builders ─────────────────────────────────────────────────
@@ -137,71 +136,6 @@ public class ManifestJobFactory(
             ConfirmAsync: null,
             OnFinished: onFinished,
             OutputPath: outDir);
-    }
-
-    /// <summary>
-    /// Fetch SteamAutoCrack (installing the .NET runtime it needs first) and open it.
-    /// </summary>
-    /// <remarks>
-    /// Modelled as a queue job so the ~100 MB first run shows real progress and can be cancelled, rather
-    /// than freezing a button. It only OPENS their GUI: the shipped release has no CLI and the GUI takes
-    /// no arguments, so nothing about the actual crack can be driven from here.
-    /// </remarks>
-    /// <param name="launchWhenDone">
-    /// False for the background-update path. Finishing an update must NOT open a second SteamAutoCrack
-    /// window while the user already has one open.
-    /// </param>
-    public DownloadJob CreateSteamAutoCrackJob(
-        bool launchWhenDone = true, Action<DownloadItem, JobResult?>? onFinished = null)
-    {
-        return new DownloadJob(
-            DownloadKind.Tool,
-            "tool:steamautocrack",
-            0,
-            "SteamAutoCrack", // a product name; deliberately not localized
-            Resources.Strings.Downloads_Kind_Tool,
-            null,
-            async (item, progress, ct) =>
-            {
-                // Runtime BEFORE the 41 MB tool: no point paying for the download if the user declines
-                // the elevation prompt.
-                OnUi(() => item.Detail = Resources.Strings.Downloads_SAC_GettingRuntime);
-                var runtimeProgress = new ProgressRelay<double?>(f =>
-                {
-                    if (f is { } v) progress.Report(new DownloadProgress((long)(v * 1000), 1000));
-                });
-                var prepared = await sac.EnsureRuntimeAsync(runtimeProgress, ct);
-                if (prepared != SacPrepareResult.Ready)
-                {
-                    // Declining the prompt, and "installed but needs a reboot", are both outcomes where
-                    // nothing went wrong — they settle as Cancelled so the row isn't dressed as an error.
-                    bool notAFailure = prepared is SacPrepareResult.RuntimeDeclined
-                                              or SacPrepareResult.RuntimeNeedsRestart;
-                    throw new DownloadAbortedException(prepared switch
-                    {
-                        SacPrepareResult.RuntimeDeclined => Resources.Strings.Err_CancelledByUser,
-                        SacPrepareResult.RuntimeNeedsRestart => Resources.Strings.Downloads_SAC_Err_Restart,
-                        _ => Resources.Strings.Downloads_SAC_Err_Runtime,
-                    }, isCancellation: notAFailure);
-                }
-
-                OnUi(() => item.Detail = Resources.Strings.Downloads_SAC_GettingTool);
-                progress.Report(new DownloadProgress(0, null)); // hand the bar back before the real download
-                // force when this job was queued by the background update probe: that probe already
-                // recorded the check timestamp, so the throttle would otherwise skip this download.
-                string? exe = await sac.EnsureToolAsync(progress, force: !launchWhenDone, ct)
-                    ?? throw new DownloadAbortedException(Resources.Strings.Downloads_SAC_Err_Tool);
-
-                OnUi(() => item.Detail = null);
-                // Directory sentinel, same as CreateDepotJob: the queue's staged-file cleanup no-ops on it.
-                return new DownloadedFile(Path.GetDirectoryName(exe)!, "SteamAutoCrack");
-            },
-            (_, _, _) => Task.FromResult(
-                !launchWhenDone ? new JobResult(true, Resources.Strings.Downloads_SAC_Updated)
-                : sac.Launch() ? new JobResult(true, Resources.Strings.Downloads_SAC_Launched)
-                : new JobResult(false, Resources.Strings.Downloads_SAC_Err_Launch)),
-            ConfirmAsync: null,
-            OnFinished: onFinished);
     }
 
     private async Task<DownloadedFile> RunDepotsAsync(

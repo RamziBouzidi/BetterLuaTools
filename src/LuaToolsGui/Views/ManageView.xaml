@@ -197,11 +197,6 @@
                                     CommandParameter="{Binding}"
                                     Header="{x:Static res:Strings.Manage_Action_Update}"
                                     Icon="{ui:SymbolIcon ArrowDownload24}" />
-                                <MenuItem
-                                    Command="{Binding PlacementTarget.Tag.RemoveDrmCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                                    CommandParameter="{Binding}"
-                                    Header="{x:Static res:Strings.Manage_Action_RemoveDrm}"
-                                    Icon="{ui:SymbolIcon WrenchScrewdriver24}" />
                                 <Separator />
                                 <MenuItem
                                     Command="{Binding PlacementTarget.Tag.OpenStorePageCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
@@ -708,15 +703,6 @@
                             Foreground="#d1d5db"
                             Text="{x:Static res:Strings.Manage_ActionsHeader}" />
 
-                        <!-- Steamless progress (only while running) -->
-                        <ProgressBar
-                            Height="3"
-                            Margin="0,0,0,8"
-                            IsIndeterminate="{Binding DataContext.IsProgressIndeterminate, ElementName=Root}"
-                            Maximum="100"
-                            Value="{Binding DataContext.Progress, ElementName=Root}"
-                            Visibility="{Binding DataContext.IsBusy, ElementName=Root, Converter={StaticResource BoolToVis}}" />
-
                         <ui:Button
                             HorizontalAlignment="Stretch"
                             Appearance="Primary"
@@ -739,14 +725,6 @@
                             CommandParameter="{Binding}"
                             Content="{x:Static res:Strings.Manage_Action_LaunchOptions}"
                             Icon="{ui:SymbolIcon Play24}" />
-                        <ui:Button
-                            Margin="0,8,0,0"
-                            HorizontalAlignment="Stretch"
-                            Command="{Binding DataContext.RemoveDrmCommand, ElementName=Root}"
-                            CommandParameter="{Binding}"
-                            Content="{x:Static res:Strings.Manage_Action_RemoveDrm}"
-                            Icon="{ui:SymbolIcon WrenchScrewdriver24}"
-                            IsEnabled="{Binding DataContext.NotBusy, ElementName=Root}" />
                         <UniformGrid Margin="0,8,0,0" Columns="2" Rows="2">
                             <ui:Button
                                 Margin="0,0,4,4"

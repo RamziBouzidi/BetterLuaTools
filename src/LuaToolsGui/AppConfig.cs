@@ -41,27 +41,9 @@ public static class AppConfig
     public const string HardwareAppIdListUrl =
         "https://raw.githubusercontent.com/jsnli/steamappidlist/master/data/hardware_appid.json";
 
-    // Steamless (atom0s): strips SteamStub DRM from a game's .exe. Downloaded via GithubProxy and
-    // cached locally; the "Remove Steam DRM" Manage action runs Steamless.CLI.exe against the game's exe.
-    public const string SteamlessRepo = "atom0s/Steamless";
-
-    // CloudRedirect (Selectively11): the Mode page "Manage" button downloads the latest CloudRedirect.exe
-    // GUI manager from here and launches it. (Separate from the CLI fixer used by the mode install flow.)
-    public const string CloudRedirectRepo = "Selectively11/CloudRedirect";
-
-    // SteamAutoCrack: the Downloads page button fetches this release and launches its GUI.
-    //
-    // Three facts about the shipped asset drive how SteamAutoCrackService handles it:
-    //   * GUI ONLY. The release contains a single exe and no SteamAutoCrack.CLI.exe, and that GUI parses
-    //     no command-line arguments, so we can open it and nothing more. There is no way to drive a
-    //     crack from here; the user does everything in their own window.
-    //   * FRAMEWORK-DEPENDENT net10.0-windows. It is a single-file bundle but the runtime is NOT inside
-    //     it (no hostpolicy/coreclr/System.Private.CoreLib, no includedFrameworks), so the .NET 10
-    //     DESKTOP runtime must be present. We install it on demand via Velopack's Runtimes API.
-    //   * Its zip has a real directory TREE (Goldberg/, TEMP/ beside the exe), unlike the flat zip
-    //     DepotDownloaderService expects. Their exe resolves those paths from its own base directory,
-    //     so extract without flattening.
-    public const string SteamAutoCrackRepo = "SteamAutoCracks/Steam-auto-crack";
+    // CloudRedirect (our pinned fork): the Mode page "Manage" button downloads the latest
+    // CloudRedirect.exe GUI manager from here and launches it.
+    public const string CloudRedirectRepo = "RamziBouzidi/CloudRedirect";
 
     // DepotDownloaderMod: downloads raw depot content from Steam's CDN using depot keys + a local manifest.
     // Powers the Depots page "Download" action.

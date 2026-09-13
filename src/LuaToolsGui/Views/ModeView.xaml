@@ -180,19 +180,6 @@
                                             Text="{Binding StatusText}"
                                             TextWrapping="Wrap" />
                                     </StackPanel>
-                                    <StackPanel
-                                        Grid.Column="1"
-                                        VerticalAlignment="Center">
-                                        <!-- Hidden on the active Custom card: nothing to install or update there. -->
-                                        <ui:Button
-                                            HorizontalAlignment="Stretch"
-                                            HorizontalContentAlignment="Center"
-                                            Command="{Binding DataContext.InstallCommand, ElementName=Root}"
-                                            CommandParameter="{Binding}"
-                                            Content="{Binding ButtonText}"
-                                            IsEnabled="{Binding DataContext.NotBusy, ElementName=Root}"
-                                            Visibility="{Binding ShowActionButton, Converter={StaticResource BoolToVis}}" />
-                                    </StackPanel>
                                 </Grid>
                             </Border>
                         </DataTemplate>
@@ -298,50 +285,5 @@
 
         </StackPanel>
 
-        <!-- Steam-shutdown confirmation overlay (covers the whole page, both rows) -->
-        <Grid
-            Grid.Row="0"
-            Grid.RowSpan="2"
-            Background="#99000000"
-            Visibility="{Binding IsConfirming, Converter={StaticResource BoolToVis}}">
-            <Border
-                MaxWidth="420"
-                Margin="8"
-                Padding="20"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Background="#1c1c22"
-                BorderBrush="#33FFFFFF"
-                BorderThickness="1"
-                CornerRadius="12">
-                <StackPanel>
-                    <TextBlock
-                        FontSize="16"
-                        FontWeight="Bold"
-                        Text="{Binding ConfirmTitle}"
-                        TextWrapping="Wrap" />
-                    <TextBlock
-                        Margin="0,8,0,0"
-                        FontSize="12.5"
-                        Foreground="#9ca3af"
-                        Text="{x:Static res:Strings.Mode_Confirm_Body}"
-                        TextWrapping="Wrap" />
-                    <StackPanel
-                        Margin="0,16,0,0"
-                        HorizontalAlignment="Right"
-                        Orientation="Horizontal">
-                        <ui:Button
-                            Margin="0,0,8,0"
-                            Command="{Binding CancelConfirmCommand}"
-                            Content="{x:Static res:Strings.Mode_Cancel}" />
-                        <ui:Button
-                            Appearance="Primary"
-                            Command="{Binding ConfirmInstallCommand}"
-                            Content="{x:Static res:Strings.Mode_CloseSteamContinue}"
-                            Icon="{ui:SymbolIcon Power24}" />
-                    </StackPanel>
-                </StackPanel>
-            </Border>
-        </Grid>
     </Grid>
 </UserControl>

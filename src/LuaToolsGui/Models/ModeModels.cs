@@ -3,8 +3,7 @@ using System.Text.Json.Serialization;
 namespace LuaToolsGui.Models;
 
 /// <summary>
-/// The Steam fixes. Mutually exclusive: only one is active at a time. Each fetches its own files
-/// from its own release; switching overwrites as needed but doesn't delete old files.
+/// The Steam fixes. Mutually exclusive: only one is active at a time.
 ///
 /// The member names are what land in the settings file, and they are deliberately new: no
 /// value written by an older build ("SteamTools", "OpenSteamTools", "OpenSteamToolsNightly",
@@ -15,15 +14,8 @@ namespace LuaToolsGui.Models;
 /// </summary>
 public enum UnlockerMode
 {
-    Ost,     // OpenSteamTools: the nightly channel (madoiscool/OST-Nightly)
+    Ost,     // OpenSteamTools: files supplied manually by the user
     Custom,  // the user manages their own unlocker; the app places nothing
-}
-
-/// <summary>How a mode's files are delivered/installed.</summary>
-public enum ModeKind
-{
-    Zip,     // a single release zip to download, verify, and extract
-    Manual,  // nothing is downloaded or placed. The user handles their own files
 }
 
 /// <summary>State of a mode's files vs. the latest published build.</summary>
@@ -37,19 +29,12 @@ public enum ModeStatus
 }
 
 /// <summary>
-/// Static description of one unlocker backend: where its files come from and what to place/clean.
+/// Static description of one unlocker backend.
 /// </summary>
 public sealed record ModeDefinition(
     UnlockerMode Mode,
     string DisplayName,
-    string Description,
-    ModeKind Kind,
-    string Owner,
-    string Repo,
-    string? FixedTag,        // e.g. "ST"; null → use the repo's latest release
-    string[] PlaceFiles,     // files that end up in the Steam root (for status/verify)
-    string? ZipAssetPattern, // e.g. "OpenSteamTool-{version}-Release.zip"; null unless Kind == Zip
-    string? HiddenUnlessFile = null); // if set, the card is hidden unless this file exists in the Steam root (or the mode is active)
+    string Description);
 
 // ── GitHub release API DTOs ─────────────────────────────────────────
 public sealed class GithubRelease
@@ -79,7 +64,7 @@ public sealed record ModeState(
     bool IsActive,           // is this the currently-selected (active) mode
     string? LatestVersion);  // resolved release tag (for display)
 
-/// <summary>State of the CloudRedirect add-on (a feature of the OST nightly build), derived
+/// <summary>State of the CloudRedirect add-on (a feature of OpenSteamTool), derived
 /// from disk (cloud_redirect.dll presence + [cloud] enabled in opensteamtool.toml) and the latest
 /// CloudRedirect release.</summary>
 public sealed record CloudRedirectAddonState(

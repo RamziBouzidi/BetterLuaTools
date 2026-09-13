@@ -16,16 +16,11 @@ public partial class DownloadsViewModel : ObservableObject
     private readonly DownloadQueue _queue;
 
     private readonly ManifestJobFactory _jobs;
-    private readonly SteamAutoCrackService _sac;
-    private readonly ToastService _toast;
 
-    public DownloadsViewModel(DownloadQueue queue, ManifestJobFactory jobs, SteamAutoCrackService sac,
-        ToastService toast)
+    public DownloadsViewModel(DownloadQueue queue, ManifestJobFactory jobs)
     {
         _queue = queue;
         _jobs = jobs;
-        _sac = sac;
-        _toast = toast;
 
         _queue.Items.CollectionChanged += (_, _) => RaiseCounts();
         _queue.History.CollectionChanged += (_, _) => RaiseCounts();
@@ -50,43 +45,6 @@ public partial class DownloadsViewModel : ObservableObject
     }
 
     // ── Commands ─────────────────────────────────────────────────────
-
-    /// <summary>
-    /// Fetch SteamAutoCrack (and the .NET runtime it needs) and open it.
-    /// </summary>
-    /// <remarks>
-    /// Goes through the queue rather than running inline: the first run pulls roughly 100 MB, which needs
-    /// a progress row and a Cancel button rather than a frozen-looking window. The job's DedupeKey means
-    /// repeated clicks join the running item instead of stacking up.
-    /// </remarks>
-    [RelayCommand]
-    private async Task LaunchSteamAutoCrack()
-    {
-        // Already installed and runnable → open it now. Going through the queue here would flash a
-        // progress row for a launch that transfers nothing AND leave a permanent history entry beside
-        // the user's real game downloads, which is the whole reason this fast path exists.
-        if (await _sac.TryLaunchIfReadyAsync())
-        {
-            _ = CheckSteamAutoCrackUpdateAsync();
-            return;
-        }
-
-        // First run, or the runtime is missing: real work, so it earns a queue row.
-        _queue.Enqueue(_jobs.CreateSteamAutoCrackJob());
-    }
-
-    /// <summary>Throttled background update probe. Only queues anything if a newer build actually exists.</summary>
-    private async Task CheckSteamAutoCrackUpdateAsync()
-    {
-        // Fire-and-forget off a UI command: an unobserved fault here must never reach the user.
-        try
-        {
-            if (_queue.FindActive("tool:steamautocrack") is not null) return; // one already in flight
-            if (await _sac.IsUpdateAvailableAsync())
-                _queue.Enqueue(_jobs.CreateSteamAutoCrackJob(launchWhenDone: false));
-        }
-        catch { /* background nicety; never surfaces */ }
-    }
 
     /// <summary>
     /// Cancel an item. A depot download that has already written to disk asks what to do with the files

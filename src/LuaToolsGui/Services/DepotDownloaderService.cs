@@ -34,7 +34,7 @@ public record DepotRunResult(bool Ok, string? Error);
 /// <summary>
 /// Runs DepotDownloaderMod to pull raw depot content from Steam's CDN. The tool is downloaded once
 /// (via <see cref="GithubProxy"/>, so blocked regions work) and cached under
-/// %AppData%\LuaToolsGui\depotdownloader, mirroring <see cref="SteamlessService"/>.
+/// %AppData%\LuaToolsGui\depotdownloader.
 /// </summary>
 /// <remarks>
 /// <para><b>No account is ever used.</b> We never pass <c>-username</c> or <c>-qr</c>, so the tool takes

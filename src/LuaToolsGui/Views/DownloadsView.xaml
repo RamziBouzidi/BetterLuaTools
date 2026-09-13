@@ -301,14 +301,6 @@
                 FontSize="22"
                 FontWeight="Bold"
                 Text="{x:Static res:Strings.Downloads_Title}" />
-            <!--  Fetches SteamAutoCrack (and the .NET runtime it needs) and opens its window. Their GUI
-                  takes no arguments, so nothing is passed to it — the user drives it from there.  -->
-            <ui:Button
-                Grid.Column="1"
-                VerticalAlignment="Center"
-                Command="{Binding LaunchSteamAutoCrackCommand}"
-                Content="{x:Static res:Strings.Downloads_SteamAutoCrack}"
-                Icon="{ui:SymbolIcon Wrench24}" />
         </Grid>
 
         <ScrollViewer

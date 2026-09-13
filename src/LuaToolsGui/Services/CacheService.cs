@@ -6,10 +6,6 @@ namespace LuaToolsGui.Services;
 /// <summary>App-tracked bookkeeping (not user settings). Install fingerprints, cached digests, etc.</summary>
 public class CacheData
 {
-    // ── OpenSteamTools install fingerprint (Mode page up-to-date check) ──
-    public string? OpenSteamToolsInstalledVersion { get; set; }
-    public string? OpenSteamToolsInstalledZipDigest { get; set; }
-
     // ── Steam appdetails rate-limit window (rolling ~200 req / ~200s per IP) ──
     // Unix-ms timestamps of recent requests, so the sliding window survives restarts and we don't
     // burst fresh into a still-counting window.
@@ -40,16 +36,12 @@ public class CacheData
     // holds delegates and can't be serialized, so nothing here is resumable.
     public List<Downloads.DownloadHistoryRecord> DownloadHistory { get; set; } = [];
 
-    // ── Downloaded tool fingerprints (DepotDownloader, Steamless, SteamAutoCrack) ──
+    // ── Downloaded tool fingerprints (DepotDownloader) ──
     // The release tag last installed, plus when we last asked GitHub. Without these the tools were
     // fetched once by a bare File.Exists check and then pinned forever, which matters now that the
     // DepotDownloader re-pack republishes on every upstream release. CheckedAtMs is Unix-ms; 0 = never.
     public string? DepotDownloaderVersion { get; set; }
     public long DepotDownloaderCheckedAtMs { get; set; }
-    public string? SteamlessVersion { get; set; }
-    public long SteamlessCheckedAtMs { get; set; }
-    public string? SteamAutoCrackVersion { get; set; }
-    public long SteamAutoCrackCheckedAtMs { get; set; }
 }
 
 /// <summary>
@@ -69,7 +61,7 @@ public class CacheService
     /// </summary>
     /// <remarks>
     /// Writers now come from several threads at once: the download queue persists history from the
-    /// dispatcher whenever an item finishes, while DepotDownloaderService and SteamlessService record
+    /// dispatcher whenever an item finishes, while DepotDownloaderService records
     /// tool versions from background threads mid-download. Two unsynchronized writers could interleave
     /// the file write or lose each other's field, and <see cref="Load"/> silently resets to an empty
     /// cache on a parse failure — which would quietly wipe DonatedAppIds, a list that is permanent by
@@ -80,20 +72,6 @@ public class CacheService
     private CacheData _cache = new();
 
     public CacheService() => Load();
-
-    /// <summary>OpenSteamTools: the release tag last installed (for the up-to-date check).</summary>
-    public string? OpenSteamToolsInstalledVersion
-    {
-        get => _cache.OpenSteamToolsInstalledVersion;
-        set { _cache.OpenSteamToolsInstalledVersion = string.IsNullOrWhiteSpace(value) ? null : value; Save(); }
-    }
-
-    /// <summary>OpenSteamTools: sha256 of the release zip last installed (inner DLL hashes aren't published).</summary>
-    public string? OpenSteamToolsInstalledZipDigest
-    {
-        get => _cache.OpenSteamToolsInstalledZipDigest;
-        set { _cache.OpenSteamToolsInstalledZipDigest = string.IsNullOrWhiteSpace(value) ? null : value; Save(); }
-    }
 
     /// <summary>Unix-ms timestamps of recent Steam appdetails requests (rolling rate-limit window).</summary>
     public IReadOnlyList<long> GetSteamApiRequestTimes() => _cache.SteamApiRequestTimes;
@@ -173,34 +151,6 @@ public class CacheService
         set { _cache.DepotDownloaderCheckedAtMs = value; Save(); }
     }
 
-    /// <summary>Release tag of the installed Steamless, or null if never recorded.</summary>
-    public string? SteamlessVersion
-    {
-        get => _cache.SteamlessVersion;
-        set { _cache.SteamlessVersion = string.IsNullOrWhiteSpace(value) ? null : value; Save(); }
-    }
-
-    /// <summary>Unix-ms of the last successful Steamless release check; 0 = never.</summary>
-    public long SteamlessCheckedAtMs
-    {
-        get => _cache.SteamlessCheckedAtMs;
-        set { _cache.SteamlessCheckedAtMs = value; Save(); }
-    }
-
-    /// <summary>Release tag of the installed SteamAutoCrack, or null if never recorded.</summary>
-    public string? SteamAutoCrackVersion
-    {
-        get => _cache.SteamAutoCrackVersion;
-        set { _cache.SteamAutoCrackVersion = string.IsNullOrWhiteSpace(value) ? null : value; Save(); }
-    }
-
-    /// <summary>Unix-ms of the last successful SteamAutoCrack release check; 0 = never.</summary>
-    public long SteamAutoCrackCheckedAtMs
-    {
-        get => _cache.SteamAutoCrackCheckedAtMs;
-        set { _cache.SteamAutoCrackCheckedAtMs = value; Save(); }
-    }
-
     /// <summary>Clear the loaded-apps notification list (ReadLoadedApps → DismissLoadedApps).</summary>
     public void ClearLoadedAppIds()
     {
@@ -244,9 +194,7 @@ public class CacheService
 
     private void SaveLocked()
     {
-        bool empty = _cache.OpenSteamToolsInstalledVersion is null
-            && _cache.OpenSteamToolsInstalledZipDigest is null
-            && _cache.SteamApiRequestTimes.Count == 0
+        bool empty = _cache.SteamApiRequestTimes.Count == 0
             && _cache.DonatedAppIds.Count == 0
             && _cache.HardwareAppIds.Count == 0
             && _cache.HardwareAppIdsFetchedAtMs == 0
@@ -255,10 +203,6 @@ public class CacheService
             && _cache.DownloadHistory.Count == 0
             && _cache.DepotDownloaderVersion is null
             && _cache.DepotDownloaderCheckedAtMs == 0
-            && _cache.SteamlessVersion is null
-            && _cache.SteamlessCheckedAtMs == 0
-            && _cache.SteamAutoCrackVersion is null
-            && _cache.SteamAutoCrackCheckedAtMs == 0;
         if (empty)
         {
             try { if (File.Exists(FilePath)) File.Delete(FilePath); } catch { /* best effort */ }
